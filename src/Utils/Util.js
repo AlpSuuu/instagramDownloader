@@ -266,9 +266,21 @@ class Util {
             }
         });
     }
+
+    /** 
+     * kendi oluşturduğumuz "awaiter" ile birlikte await kullanmadan "yield" ile birlikte verileri kolaylıkla çekeiliyorduk.
+     * ancak çektiğimiz veriler awaiter'ımızın 4. parametresi olan jeneratör fonksiyon bloğumuzun içinde yer alıyordu
+     * işte bu fonksiyonla birlikte "yield" ederek çektiğimiz verileri jeneratör fonksiyonumuzun dışına "GLOBAL" olarak çıkartıyoruz
+     *  
+     * @param {Class} synchronizer
+     * @returns {Class} - iki fonksiyonlu bir class döndürüyor
+     */
     static synchronizer() {
         return class {
             constructor() {
+                /**
+                 * @param {Function} async calllback fonksiyonumuzu giriyoruz ki fonsksiyonumuzu çağırarak verileri çekebilelim.
+                 */
                 this.async = function(func) {
                     return function(error , resolve) {
                         var still = true
@@ -308,12 +320,19 @@ class Util {
                     }
             },
             
-            this.wait = this.async(function (timeout, done) {
+           /**
+            * @param {Function} wait iki parametreli bir fonskiyonuz "[...arguments][1]" yani 2. argümanımız bir fonksiyonu temsil ediyor
+            * 1. argümanımız ise ([...arguments][0]) o fonksiyonumuzu ne kadar süre sonra çağıracağımızı belirliyor
+            * 
+            * @param {Number} timeout - milisaniye cinsinden işlemi yaptırma süresini yazıyoruz.
+            * @param {Function} callback - işlemi yapma süresi geldiğinde çağırılacak fonksiyonumuz.
+            */
+            this.wait = this.async(function (timeout, callback) {
                 let args = [];
-                if(done.arguments) for(var [key , value = done.arguments[key]] in arguments) args.push(value);
+                if(callback.arguments) for(var [key , value = callback.arguments[key]] in arguments) args.push(value);
             
                     setTimeout(() => {
-                        done.call(void 0 , args)
+                        callback.call(void 0 , args)
                     }, timeout)
                 })
             }
