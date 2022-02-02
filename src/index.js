@@ -119,8 +119,6 @@ class İnstagramDownloader  {
             let url = Util.createNewURL(ID)
             let { data } = yield Util.fetcher.get(url);
 
-            console.log(data.items)
-
             if(!data || !data?.items) throw new İnstagramError(`no data found for "${ID}"` , "HttpError")
 
             callback.call(void 0 , null , data?.items[0])
