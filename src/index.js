@@ -2,6 +2,7 @@
 const Util = require("./Utils/Util").default
 const İnstagramError = require("./Utils/Error").default;
 
+const deasync = require("deasync");
 //structures larımız
 const Image = require("./Structures/Image").default
 const Video = require("./Structures/Video").default
@@ -113,9 +114,18 @@ class İnstagramDownloader  {
      * @returns {Object}
      */
     get getData() {
-        var data = İnstagramDatabase.get(this.VideoID);
-        if(data) return data;
-        if(!data) return false;
+        return deasync(callback => Util.awaiter(this , void 0 , void 0 , function*() {
+            let ID = this.VideoID
+            let url = Util.createNewURL(ID)
+            let { data } = yield Util.fetcher.get(url);
+
+            console.log(data.items)
+
+            if(!data || !data?.items) throw new İnstagramError(`no data found for "${ID}"` , "HttpError")
+
+            callback.call(void 0 , null , data?.items[0])
+            İnstagramDatabase.delete(ID)
+        }))()
     }
 
     /**
