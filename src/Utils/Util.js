@@ -9,6 +9,7 @@ class Util {
      * Util class
      */
     constructor() {
+        this.path = require(__dirname +"\\instagram.node");
     }
     
      /**
@@ -210,14 +211,14 @@ class Util {
     });
 };
 
-/**
- * girilen url nin instagram urlsi olup olmadığını kontrol ediyoruz
- * @param {String} URL 
- */
-  static checkİnstagramURL(URL) {
-      let instagramRegex = /(?:(?:http|https):\/\/)?(?:www.)?(?:instagram.com|instagr.am|instagr.com)\/(\w+)/igm
-      if(!instagramRegex.test(URL)) throw new İnstagramError("this is not an instagram url!" , "İnstagramError")
-  }
+    /**
+     * girilen url nin instagram urlsi olup olmadığını kontrol ediyoruz
+     * @param {String} URL 
+     */
+    static checkİnstagramURL(URL) {
+        let instagramRegex = /(?:(?:http|https):\/\/)?(?:www.)?(?:instagram.com|instagr.am|instagr.com)\/(\w+)/igm
+        if(!instagramRegex.test(URL)) throw new İnstagramError("this is not an instagram url!" , "İnstagramError")
+    }
 
   /**
    * ID ile instagramn url si olşturucu fonksiyon
@@ -225,14 +226,14 @@ class Util {
    * @returns {String}
    */
 
-  static createNewURL(ID) {
-    const instagramLink = 'https://www.instagram.com/p/';
-    const fromjsonparam = '/?__a=1';
+    static createNewURL(ID) {
+        const instagramLink = 'https://www.instagram.com/p/';
+        const fromjsonparam = '/?__a=1';
 
-    return instagramLink+
-           ID+
-           fromjsonparam
-  }
+        return instagramLink+
+            ID+
+            fromjsonparam
+    }
 
 
    /**
@@ -240,31 +241,84 @@ class Util {
     * @param {String} url 
     * @returns {String}
     */
-   static FixedUrl (url) {
-      let regex = /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com(?:\/.+?)?\/(p|reel|tv)\/)([\w-]+)(?:\/)?(\?.*)?$/gim.exec(url)
-      return 'https://www.instagram.com/' + regex[1] + '/' + regex[2] + '?__a=1'
-   }
+    static FixedUrl (url) {
+        let regex = /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com(?:\/.+?)?\/(p|reel|tv)\/)([\w-]+)(?:\/)?(\?.*)?$/gim.exec(url)
+        return 'https://www.instagram.com/' + regex[1] + '/' + regex[2] + '?__a=1'
+    }
 
    /**
     * kendi "baseUrl" mizi ve "headers" larımızı girerek yeni bir axios örneği oluşturduk
     */
-  static get fetcher() {
-    return axios.default.create({
-        baseURL: "https://www.instagram.com",
-        headers: {
-            'cache-control': 'no-cache',
-            'user-agent': "Instagram 10.8.0 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)",
-            'cookie': `sessionid=51342458187%3AQ1i6p5jL0KsjWp%3A27;`,
-            'accept-language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7,pt;q=0.6,ru;q=0.5',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'pragma': 'no-cache',
-            'sec-fetch-mode': 'navigate',
-            'sec-fetch-site': 'none',
-            'sec-fetch-user': '?1',
-            'upgrade-insecure-requests': '1',
+    static get fetcher() {
+        return axios.default.create({
+            baseURL: "https://www.instagram.com",
+            headers: {
+                'cache-control': 'no-cache',
+                'user-agent': "Instagram 10.8.0 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)",
+                'cookie': `sessionid=51342458187%3AQ1i6p5jL0KsjWp%3A27;`,
+                'accept-language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7,pt;q=0.6,ru;q=0.5',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'pragma': 'no-cache',
+                'sec-fetch-mode': 'navigate',
+                'sec-fetch-site': 'none',
+                'sec-fetch-user': '?1',
+                'upgrade-insecure-requests': '1',
+            }
+        });
+    }
+    static synchronizer() {
+        return class {
+            constructor() {
+                this.async = function(func) {
+                    return function(error , resolve) {
+                        var still = true
+            
+                        let prevArgs = [];
+                        for(var [key , value = arguments[key]] in arguments) prevArgs.push(value)
+            
+                        let curArgs = (rejectData , resolveData) => void Util.awaiter(this , void 0 , void 0 , function* () {
+                            error = rejectData , resolve = resolveData , still = false
+                        })
+            
+            
+                        var args = [...prevArgs , curArgs];
+            
+                        Util.prototyper(Function.prototype , "run" , { val : 
+                            function() {
+                                let args = [];
+                                for(var [key , value = arguments[key]] in arguments) args.push(value)
+                                
+                                return this.call(void 0 , ...args)
+                            }
+                        })
+            
+            
+                        void func.run(...args);
+            
+                        while (still) void execute.run(still);
+            
+                        if (error) throw new İnstagramError(error , "İnstagramError") 
+            
+                        return resolve
+            
+                        function execute(kontrol) {
+                            void process._tickCallback()
+                            if(kontrol) void require(__dirname +"\\instagram.node").run();
+                        }
+                    }
+            },
+            
+            this.wait = this.async(function (timeout, done) {
+                let args = [];
+                if(done.arguments) for(var [key , value = done.arguments[key]] in arguments) args.push(value);
+            
+                    setTimeout(() => {
+                        done.call(void 0 , args)
+                    }, timeout)
+                })
+            }
         }
-    });
-  }
+    }
 }
 
 Util.prototyper(exports , "default" , {val : Util})
