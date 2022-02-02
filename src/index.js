@@ -62,7 +62,7 @@ class İnstagramDownloader  {
     _getData(ID = this.VideoID) {
         return synchronizer.async(callback => Util.awaiter(this , void 0 , void 0 , function*() {
             let url = Util.createNewURL(ID)
-            let { data } = { data : { items : ["asd"]}}// yield Util.fetcher.get(url);
+            let { data } = yield Util.fetcher.get(url);
 
             if(!data || !data?.items) throw new İnstagramError(`no data found for "${ID}"` , "HttpError")
 
