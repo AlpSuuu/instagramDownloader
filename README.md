@@ -19,7 +19,7 @@ let İnstagram = new Downloader("https://www.instagram.com/p/CZW4UQQMlBp/")
 
 ## Örnekler;
 
-# await kullanmak istemiyorsanız aşağıdaki gibi kullanabilirsiniz fakat datanın inmesini bekleneniz gerekiyor **max: 1-2 saniye**
+# await kullanmak istemiyorsanız aşağıdaki gibi kullanabilirsiniz await kullanmadığınız için datayı çekmek için ayrıca bir süre beklemeniz gerekmiyor 😋
  
 ```js
 /**
