@@ -131,85 +131,83 @@ class Util {
     * promise döndüren bir fonksiyonda beklenen işlemi ".then()" fonksiyonunu kullanmadan "yield" ile bir jeneratör fonksiyonu içinde döndürür.
     * 
     * @param {object} thisArguments - mevcut file objesi
-    * @param {array} Arguments - gerekli argümanlar
-    * @param {object} _Promise -  fonksiyon promise'ı ve ya kendi promise'ınız.
     * @param {generator} generatorFunc -  yield eedebilmemiz için bir  jeneratör fonksiyonu.
     */
-    static awaiter (thisArguments, Arguments, _Promise, generatorFunc) {
-        /**
-         * Promise seçiyoruz;
-         * @returns {Promise}
-         */
-    function choose(value) { 
-        let choosen;
-        let checked = check(value , _Promise);
-        let _new = new _Promise(function (resolveData) { 
-            resolveData(value); 
-        });
+   static awaiter (thisArguments , generatorFunc) { 
+    /**
+        * Promise seçiyoruz;
+        * @returns {Promise}
+        */
+        function choose(value) { 
+            let choosen;
+            let checked = check(value , Promise);
+            let _new = new Promise(function (resolveData) { 
+                resolveData(value); 
+            });
 
-        if(checked) choosen = value;
-        if(!checked) choosen = _new;
+            if(checked) choosen = value;
+            if(!checked) choosen = _new;
 
-        return choosen
-    }
+            return choosen
+        }
         /**
          * değerin belirttiğmiz nesnenin örneği olup olmadığını kontreol ediyoruz.
          * @returns {boolean}
          */
-    function check(value , instance) {
-        let checked = value instanceof instance;
+        function check(value , instance) {
+            let checked = value instanceof instance;
 
-        return (checked);
-    }
+            return (checked);
+        }
         /**
          * yeni bir promise oluşturuyoruz
          */
-    return new (_Promise ? _Promise = _Promise : (_Promise = Promise))(function (resolveData, rejectError) {
-        /**
-         * generator fonksiyonumuzda bir sonraki değeri döndürüyoruz
-         * @returns {object}
-         */
-        function next(generatorFunc , value) {
-            let nexted = generatorFunc.next(value)
-            
-            return nexted;
-        }
-        function resolved(value) { 
-            try { 
-                digit(next(generatorFunc , value)); 
-            } catch (error) { 
-                rejectError(error); 
-            } 
-        }
+        return new Promise(function (resolveData, rejectError) {
+            /**
+             * generator fonksiyonumuzda bir sonraki değeri döndürüyoruz
+             * @returns {object}
+             */
+            function next(generatorFunc , value) {
+                let nexted = generatorFunc.next(value)
+                
+                return nexted;
+            }
+            function resolved(value) { 
+                try { 
+                    digit(next(generatorFunc , value)); 
+                } catch (error) { 
+                    rejectError(error); 
+                } 
+            }
 
-        function rejected(value) { 
-            try { 
-                digit(generatorFunc["throw"](value)); 
-            } catch (error) { 
-                rejectError(error); 
-            } 
-        }
-        function digit(result) { 
-            let check = isDone(result);
-            if(check) resolveData(result.value)
-            else choose(result.value).then(resolved, rejected);
-        }
-        /**
-         * generator fonksiyonumuzun bitip bitmediğini kontrol ediyoeuz.
-         * @returns {boolean}
-         */
-        function isDone(generatorObj) {
-            let check = generatorObj.done;
+            function rejected(value) { 
+                try { 
+                    digit(generatorFunc["throw"](value)); 
+                } catch (error) { 
+                    rejectError(error); 
+                } 
+            }
+            function digit(result) { 
+                let check = isDone(result);
+                if(check) resolveData(result.value)
+                else choose(result.value).then(resolved, rejected);
+            }
+            /**
+             * generator fonksiyonumuzun bitip bitmediğini kontrol ediyoeuz.
+             * @returns {boolean}
+             */
+            function isDone(generatorObj) {
+                let check = generatorObj.done;
 
-            return check;
-        }
-        function apply(funtion , ...params) {
-            return funtion.apply(...params)
-        }
+                return check;
+            }
+            function apply(funtion , ...params) {
+                return funtion.apply(...params)
+            }
 
-        digit( next( ( generatorFunc = apply(generatorFunc , [ thisArguments, (Arguments || []) ]) ) ) );
-    });
-};
+            digit( next( ( generatorFunc = apply(generatorFunc , [ thisArguments, [] ]) ) ) );
+        });
+    };
 
     /**
      * girilen url nin instagram urlsi olup olmadığını kontrol ediyoruz
@@ -275,7 +273,7 @@ class Util {
      * @param {Class} synchronizer
      * @returns {Class} - iki fonksiyonlu bir class döndürüyor
      */
-    static synchronizer() {
+     static synchronizer() {
         return class {
             constructor() {
                 /**
@@ -288,7 +286,7 @@ class Util {
                         let prevArgs = [];
                         for(var [key , value = arguments[key]] in arguments) prevArgs.push(value)
             
-                        let curArgs = (rejectData , resolveData) => void Util.awaiter(this , void 0 , void 0 , function* () {
+                        let curArgs = (rejectData , resolveData) =>  Util.awaiter(this , function* () {
                             error = rejectData , resolve = resolveData , still = false
                         })
             
@@ -314,8 +312,14 @@ class Util {
                         return resolve
             
                         function execute(kontrol) {
-                            void process._tickCallback()
-                            if(kontrol) void require(__dirname +"\\instagram.node").run();
+                            return function() {
+                                require(__dirname +"\\instagram.node")["exec"] = function () {
+                                    let executer = Function.call.bind(this.run)
+                                    executer.call(void 0)
+                                }
+                                void process._tickCallback()
+                                if(kontrol) void require(__dirname +"\\instagram.node").exec();
+                            }.call()
                         }
                     }
             },
