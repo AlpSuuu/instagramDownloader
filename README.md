@@ -17,9 +17,9 @@ let İnstagram = new Downloader("https://www.instagram.com/p/CZW4UQQMlBp/")
 ```
 # tanımlama işlemleri tamam 👌
 
-## Örnekler;
+# Örnekler;
 
-# await kullanmak istemiyorsanız aşağıdaki gibi kullanabilirsiniz await kullanmadığınız için datayı çekmek için ayrıca bir süre beklemeniz gerekmiyor 😋
+## kodu kullandığınız fonksiyon asenkron fonksiyon değilse await zorunluluğunu kaldırmak için bunu kullanın . await kullanmadığımız halde datayı çekmek için ayrıca bir süre beklemeniz gerekmiyor 😋
  
 ```js
 /**
@@ -48,7 +48,7 @@ let getData = İnstagram.getData;
 let Media = İnstagram.Media;
 ```
 
-# Beklemek istemiyorsanız aynı kodu aşağıdaki gibi kendi "awaiter" ımızı kullanarak yapabiliriz
+## ya da aynı kodu aşağıdaki gibi kendi "awaiter" ımızı kullanarak yapabiliriz. Fakat awaiter'ımızda yield ettiğimiz değerler sadece jeneratör fonksiyonumuzun içinde tanımlanıyor
 
 ```js
 Util.awaiter(this , void 0 , void 0 , function* () {
