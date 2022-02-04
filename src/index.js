@@ -60,7 +60,7 @@ class İnstagramDownloader  {
      * @returns {Promise<void>}
      */
     _getData(ID = this.VideoID) {
-        return synchronizer.async(callback => Util.awaiter(this , void 0 , void 0 , function*() {
+        return synchronizer.async(callback => Util.awaiter(this , function*() {
             let url = Util.createNewURL(ID)
             let { data } = yield Util.fetcher.get(url);
 
@@ -102,7 +102,7 @@ class İnstagramDownloader  {
      */
     get asyncData() {
         let url = this.Url
-        return new Promise((resolveData , reject) => Util.awaiter(this , void 0 , void 0 ,function* () {
+        return new Promise((resolveData , reject) => Util.awaiter(this , function* () {
             let { data:{ items } } = yield Util.fetcher.get(Util.FixedUrl(url)).catch(() => { });
             if(!items) return reject("bulunamadı");
 
@@ -116,7 +116,7 @@ class İnstagramDownloader  {
      * @returns {Object}
      */
     get getData() {
-        return synchronizer.async(callback => Util.awaiter(this , void 0 , void 0 , function*() {
+        return synchronizer.async(callback => Util.awaiter(this , function*() {
             let ID = this.VideoID
             let url = Util.createNewURL(ID)
             let { data } = yield Util.fetcher.get(url);
