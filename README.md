@@ -58,7 +58,7 @@ Util.awaiter(this, function* () {
      * Girmiş olduğunuz urlnin verilerini çeker ve size getirir
      * 
      * @name İnstagram#getData
-     * @returns {Object}
+     * @returns {Promise<void>}
      */
     let getData = yield İnstagram.asyncData;
 
