@@ -51,7 +51,7 @@ let Media = İnstagram.Media;
 ## ya da aynı kodu aşağıdaki gibi kendi "awaiter" ımızı kullanarak yapabiliriz. Fakat awaiter'ımızda yield ettiğimiz değerler sadece jeneratör fonksiyonumuzun içinde tanımlanıyor
 
 ```js
-Util.awaiter(this , void 0 , void 0 , function* () {
+Util.awaiter(this, function* () {
     let İnstagram = yield new Downloader("https://www.instagram.com/p/CZW4UQQMlBp/")
 
     /**
