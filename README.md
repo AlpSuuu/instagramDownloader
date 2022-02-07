@@ -105,7 +105,33 @@ let instagramData = synchronizer.async(callback => Util.awaiter(this , function*
 console.log(instagramData) // output : Object { ... } - İnstagramData
 ```
 
+# TEST AŞAMASI
+## Eğer projenizi çalıştırdığınız editörün consoluna erişiminiz varsa (okuma ve log tutma gibi) aşağıdaki verdiğim kodu bir dosya açıp içine atın daha sonra dosyayı çalıştırın.
 
+### Deneme Kodu;
+
+```jsconst Downloader = require("./src/index").default;
+const Util = new require("./src/index").Util;
+const Logger = Util.logger()
+
+
+let logger = new Logger(process);
+
+
+logger.oluştur("Bilgilerine bakmak istediğiniz medyanın linkini giriniz...\r\n" , cevap_1=> {
+    logger.oluştur("Url nin verisini mi göndermemi istersin medyasını mı? lütfen sadece `veri` ya da `medya` olarak cevap verin!!!\r\n" , cevap_2 => {
+        if(!["veri" , "medya"].some(x => cevap_2 === x)) return console.log("lütfen sadece `medya` ya da `veri` yazınız!!!")
+
+        let instagram = new Downloader(cevap_1.trim())
+
+        if(cevap_2.toLowerCase() === "veri") console.log("Belirttiğiniz Urlnin bilgileri gönderiliyor...\n") , console.log(instagram.getData);
+        if(cevap_2.toLowerCase() === "medya") console.log("Belirttiğiniz Urlnin Mediya bilgileri gönderiliyor...\n") , console.log(instagram.Media);
+
+        logger.kapat()
+    });
+})
+```
+## Tüm işlemler tamam yukarıdaki kodu kullanarak aşağıdaki videoda olduğu gibi kodunuzu test edebilirsiniz...! Not: "Medya" ve "Veri" bilgilerini çekerken 5 sn kadar beklemelisiniz.
 https://user-images.githubusercontent.com/67225902/152855939-18552b76-543b-4ff3-8587-ca8e08880df7.mp4
 
 
