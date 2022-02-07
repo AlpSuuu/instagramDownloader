@@ -123,7 +123,7 @@ class İnstagramDownloader  {
 
             if(!data || !data?.items) throw new İnstagramError(`no data found for "${ID}"` , "HttpError")
 
-            callback.call(void 0 , null , data?.items[0])
+            callback.call(void 0 , data?.items[0])
             İnstagramDatabase.delete(ID)
         }))()
     }
