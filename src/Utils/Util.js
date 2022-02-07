@@ -286,7 +286,7 @@ class Util {
                         let prevArgs = [];
                         for(var [key , value = arguments[key]] in arguments) prevArgs.push(value)
             
-                        let curArgs = (rejectData , resolveData) =>  Util.awaiter(this , function* () {
+                        let curArgs = (resolveData) =>  Util.awaiter(this , function* () {
                             resolve = resolveData , still = false
                         })
             
