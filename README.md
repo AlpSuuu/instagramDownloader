@@ -178,6 +178,32 @@ Util.prototyper(Array.prototype , "değerSayısı" , {
 
 console.log(["a" , "l" , "p" , "s" , "u" , "<3"].değerSayısı()) // output : 6 
 ```
+## Awaiter
+```js
+const Util = new require("./src/index").Util;
+
+/**
+ * Bir promise fonksiyonu belirtiyoruz ki awaiter'ımız ile await kullanmadan değeri çekebilelim.
+ * @returns {Promise<void>}
+ */
+function promiseFunc() {
+    return new Promise((res , rej) => res("alpsu <3"));
+}
+
+/**
+ * Util.awaiter
+ * 
+ * @param {Object} arguments[0] - bu kısma kodu çalıştırdığınız dosyanızı yazınız (this yazmanız yeterli)
+ * @param {GeneratorFunction} arguments[1] - bu kısma bir generatör fonksiyon giriniz
+ * 
+ * awaiter'ımızda aşağıda benim kullandığım gibi kullanın başka bir şey eklemeyin!!!
+ */
+Util.awaiter(this , function* gen() {
+    let value = yield promiseFunc.call(void 0);
+
+    console.log(value) // output : "alpsu <3"
+})
+```
 
 
 
