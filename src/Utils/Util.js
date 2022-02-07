@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const İnstagramError = require("./Error").default;
+const İnstagram = require("./Error").default;
 
 const axios = require("axios");
 
@@ -280,14 +280,14 @@ class Util {
                  * @param {Function} async calllback fonksiyonumuzu giriyoruz ki fonsksiyonumuzu çağırarak verileri çekebilelim.
                  */
                 this.async = function(func) {
-                    return function(error , resolve) {
+                    return function(resolve) {
                         var still = true
             
                         let prevArgs = [];
                         for(var [key , value = arguments[key]] in arguments) prevArgs.push(value)
             
                         let curArgs = (rejectData , resolveData) =>  Util.awaiter(this , function* () {
-                            error = rejectData , resolve = resolveData , still = false
+                            resolve = resolveData , still = false
                         })
             
             
@@ -306,8 +306,6 @@ class Util {
                         void func.run(...args);
             
                         while (still) void execute.run(still);
-            
-                        if (error) throw new İnstagramError(error , "İnstagramError") 
             
                         return resolve
             
