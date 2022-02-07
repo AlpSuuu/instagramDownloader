@@ -1,4 +1,4 @@
-## instagramDownloader
+## [instagramDownloader 😋](https://github.com/AlpSuuu/instagramDownloader/)
 basit bir instagram media indirme projesi.
 
 ## Lisans
