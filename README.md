@@ -204,6 +204,28 @@ Util.awaiter(this , function* gen() {
     console.log(value) // output : "alpsu <3"
 })
 ```
+## Synchronizer
+```js
+const Util = new require("./src/index").Util;
 
+let senkronizer = new (Util.synchronizer());
+
+/**
+ * Bir promise fonksiyonu belirtiyoruz ki sonkronizer'imiz ile Promise.resolve() değerini çekebilelim.
+ * @returns {Promise<void>}
+ */
+function promiseFunc() {
+    return new Promise((res , rej) => res("alpsu <3"));
+}
+
+let resolved = senkronizer.async(callback => Util.awaiter(this , function* () {
+    let value = yield promiseFunc.call(void 0);
+
+    callback.call(void 0 , value);
+})).call(void 0)
+
+console.log(resolved) // output : alpsu <3
+```
+## Logger
 
 
