@@ -104,3 +104,9 @@ let instagramData = synchronizer.async(callback => Util.awaiter(this , function*
 
 console.log(instagramData) // output : Object { ... } - İnstagramData
 ```
+
+
+https://user-images.githubusercontent.com/67225902/152855939-18552b76-543b-4ff3-8587-ca8e08880df7.mp4
+
+
+
