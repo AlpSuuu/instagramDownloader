@@ -99,7 +99,7 @@ let instagramData = synchronizer.async(callback => Util.awaiter(this , function*
      */
     let Data = yield İnstagram.asyncData;
 
-    callback.call(void 0 , null , Data);
+    callback.call(void 0 , Data);
 })).call(void 0)
 
 console.log(instagramData) // output : Object { ... } - İnstagramData
