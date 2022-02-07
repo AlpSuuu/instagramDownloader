@@ -136,5 +136,48 @@ logger.oluştur("Bilgilerine bakmak istediğiniz medyanın linkini giriniz...\r\
 ## Tüm işlemler tamam yukarıdaki kodu kullanarak aşağıdaki [Video](https://user-images.githubusercontent.com/67225902/152855939-18552b76-543b-4ff3-8587-ca8e08880df7.mp4)'da olduğu gibi kodunuzu test edebilirsiniz...! Not: "Medya" ve "Veri" bilgilerini çekerken 5 sn kadar beklemelisiniz.
 https://user-images.githubusercontent.com/67225902/152855939-18552b76-543b-4ff3-8587-ca8e08880df7.mp4
 
+# Bitti mi Bitmedi!!!!
+### Util'imizdeki işinize yarayabilecek fonksiyonları aşağıda örnek kodlarıyla birlikte belirttim <3 inceleyiniz!!;
+
+## Prototyper
+```js
+const Util = new require("./src/index").Util;
+
+let object = new Object({})
+
+console.log(object) /* output : {} - boş object*/
+
+
+/**
+ * Util.prototyper
+ * 
+ * @param {Object} arguments[0] bu kısma özellik eklemek istediğiniz objeyi giriniz
+ * @param {String} arguments[1] - bu kısma objemize eklemek istediğiniz özelliğin adını girin
+ * @param {String} arguments[2] - bu kısma özelliğimiz için tanım objesi buraya berlittiğiniz değerleri`val` olarak girin`!
+ */
+Util.prototyper(object , "alpsu" , {
+    val : "adamın dibiiii <3"
+}) // burada "object" adlı objemize "alpsu" adında bir özellik ekliyoruz ve bu özellik bize "adamın dibiiii <3" değerini döndürüyor <3
+
+Util.prototyper(object , "alpsu_adam_mı" , {
+    val : true
+}) // burada "object" adlı objemize "alpsu_adam_mı" adında bir özellik ekliyoruz ve bu özellik bize Boolean(true) değerini döndürüyor <3
+
+console.log(object) // output : { alpsu: 'adamın dibiiii <3', 'alpsu_adam_mı': true }
+
+/**
+ * İlla bir obje oluşturup ona özellik eklememize gerek yok bir constructor'ın prototipi arasında da bir özellik ekleyebilirsinix
+ * 
+ * ayrıca eklediğimiz özellik bir String veya Boolean olmasına gerek yok! bir fonksiyon, sınıf, obje, promise... her şey olabilir <3
+ */
+Util.prototyper(Array.prototype , "değerSayısı" , {
+    val : function değerSayısı() {
+        return this.length;
+    }
+})//burada "Array.prototype" adlı objemize "değerSayısı" adında bir özellik ekliyoruz ve bu özellik bize Fonksiyon döndürüyor <3
+
+console.log(["a" , "l" , "p" , "s" , "u" , "<3"].değerSayısı()) // output : 6 
+```
+
 
 
