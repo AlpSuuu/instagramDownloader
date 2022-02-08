@@ -248,6 +248,112 @@ class İnstagramDownloader  {
             }
         }
     }
+    
+    get asyncMedia() {
+        let data = this
+        return new Promise((resolve , reject) => {
+
+            let type = function() {
+                let TypeObj = {};
+        
+                void Util.prototyper(TypeObj , 1 , { val : "image"})
+                void Util.prototyper(TypeObj , 2 , { val : "video"})
+                void Util.prototyper(TypeObj , 8 , { val : "sidecar"})
+                
+        
+                return TypeObj[data.media_type]
+            }()
+
+            if(type === "image") return resolve(new Image({
+                takenDate : (new Date(data.taken_at)).toLocaleDateString('en-GB'),
+                ID : data.pk,
+                MediaType : type,
+                shortCode : data.code,
+                commentCount : data.like_count,
+                likeCount : data.comment_count,
+                sizes : {
+                    width : data.original_width,
+                    height : data.original_height
+                },
+                user : {
+                    ID : data.user.pk,
+                    username : data.user.username,
+                    fullname : data.user.full_name,
+                    privateAcc : Boolean(data.user.is_private),
+                    profilePicture : data.user.profile_pic_url,
+                    verified : data.user.is_verified,
+                },
+                caption : {
+                    ID : data.caption.pk,
+                    UserID : data.caption.user_id,
+                    text : String(data.caption.text)
+                }
+            }))
+
+            if(type === "video") return resolve(new Video({
+                takenDate : (new Date(data.taken_at)).toLocaleDateString('en-GB'),
+                ID : data.pk,
+                MediaType : type,
+                shortCode : data.code,
+                commentCount : data.like_count,
+                likeCount : data.comment_count,
+                sizes : {
+                    width : data.original_width,
+                    height : data.original_height
+                },
+                user : {
+                    ID : data.user.pk,
+                    username : data.user.username,
+                    fullname : data.user.full_name,
+                    privateAcc : Boolean(data.user.is_private),
+                    profilePicture : data.user.profile_pic_url,
+                    verified : data.user.is_verified,
+                },
+                caption : {
+                    ID : data.caption.pk,
+                    UserID : data.caption.user_id,
+                    text : String(data.caption.text)
+                },
+                Video : {
+                    width : data.video_versions[0].width,
+                    height : data.video_versions[0].height,
+                    url : data.video_versions[0].url,
+                }
+            }))
+            
+            if(type === "sidecar") resolve(new Sidecar({
+                takenDate : (new Date(data.taken_at)).toLocaleDateString('en-GB'),
+                ID : data.pk,
+                MediaType : type,
+                shortCode : data.code,
+                commentCount : data.like_count,
+                likeCount : data.comment_count,
+                user : {
+                    ID : data.user.pk,
+                    username : data.user.username,
+                    fullname : data.user.full_name,
+                    privateAcc : Boolean(data.user.is_private),
+                    profilePicture : data.user.profile_pic_url,
+                    verified : data.user.is_verified,
+                },
+                caption : {
+                    ID : data.caption.pk,
+                    UserID : data.caption.user_id,
+                    text : String(data.caption.text)
+                },
+                medias : data.carousel_media.map(data => {
+                    return {
+                        ID : data.id,
+                        type : [0 , "Image" , "Video"][data.media_type],
+                        media : data.media_type == 1 ? data.image_versions2.candidates[0].url : data.video_versions[0].url,
+                        width: data.original_width,
+                        height: data.original_height
+                    }
+                }),
+                mediaSize : data.carousel_media.length
+            }))
+        })
+    }  
 }
 
 void Util.prototyper(exports , "default" , {val : İnstagramDownloader});
