@@ -119,8 +119,8 @@ const Logger = Util.logger()
 let logger = new Logger(process);
 
 
-logger.oluştur("Bilgilerine bakmak istediğiniz medyanın linkini giriniz...\r\n" , cevap_1=> {
-    logger.oluştur("Url nin verisini mi göndermemi istersin medyasını mı? lütfen sadece `veri` ya da `medya` olarak cevap verin!!!\r\n" , cevap_2 => {
+logger.oluştur({ yazı : "Bilgilerine bakmak istediğiniz medyanın linkini giriniz...\r\n", ilkMesaj : true }, cevap_1=> {
+    logger.oluştur({ yazı : "Url nin verisini mi göndermemi istersin medyasını mı? lütfen sadece `veri` ya da `medya` olarak cevap verin!!!\r\n", ilkMedaj : false }, cevap_2 => {
         if(!["veri" , "medya"].some(x => cevap_2 === x)) return console.log("lütfen sadece `medya` ya da `veri` yazınız!!!")
 
         let instagram = new Downloader(cevap_1.trim())
