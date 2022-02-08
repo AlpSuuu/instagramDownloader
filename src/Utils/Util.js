@@ -340,6 +340,79 @@ class Util {
             }
         }
     }
+    
+    static logger() { return class {
+        constructor(_process = process) {
+            //super(process);
+    
+            this.process = _process
+            this.giriş = _process.stdin;
+            this.çıkış = _process.stdout;
+
+        }
+    
+        oluştur(yazı , calback) {
+            let Logger = new (Util.logger())(this.process);
+    
+            Logger.çalıştır(yazı  , calback)
+        } 
+    
+         çalıştır(yazı , callback) {
+            if(yazılar.includes(yazı)) return
+            this.gönder(yazı);
+
+    
+            this.sonMesaj("data" , async data => { 
+                let çıktı = this.düzelt(data);
+        
+                callback.call(void 0 , this.mesaj(çıktı))
+                yazılar.push(yazı);
+            })
+        }
+
+        çalıştır({ilkMesaj , yazı}, callback) {
+            if(yazılar.includes(yazı)) return
+            this.gönder(yazı);
+            yazılar.push(yazı);
+
+            let { sonMesaj , giriş , mesaj , düzelt} = this
+
+            if(ilkMesaj) return sonMesaj(giriş,düzelt ,mesaj).then(res => callback.call(void 0 , res));
+            else giriş.on("data" , async data => { 
+                let çıktı = this.düzelt(data);
+        
+                callback.call(void 0 , this.mesaj(çıktı))
+            })
+        }
+    
+       
+        gönder(yazı) {
+            this.çıkış.write(yazı);
+        }
+    
+
+        sonMesaj(giriş , düzelt , mesaj) {
+            return new Promise((res , rej) => Util.awaiter(this , function* () {
+                giriş.on("data" , async data => { 
+                    let çıktı = düzelt(data);
+            
+                    res.call(void 0 , mesaj(çıktı))
+                })
+            }))
+        }
+    
+        düzelt(yazı) {
+            return Buffer.from(yazı).toString("utf-8");
+        }
+    
+        mesaj(yazı) {
+            return new String(yazı.trim()).toString();
+        }
+    
+        kapat() {
+            process.stdin.pause()
+        }
+    }}
 }
 
 Util.prototyper(exports , "default" , {val : Util})
