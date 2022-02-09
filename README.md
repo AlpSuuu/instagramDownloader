@@ -83,7 +83,7 @@ Util.awaiter(this, function* () {
 
 ## Yukaradaki örneğimizde olduğu gibi awaiter'ımızı kullanarak yield ile yakaladığımız Promise çözümleri yalnızca jeneratör fonksiyon bloğu içinde tanımlayabiliyorduk
 
-## Peki ya yakaladığımız Promise çözümlerini nasıl jeneratör fonksiyon bloğunun dışına nasıl çıkaracağız??
+## Peki ya yakaladığımız Promise çözümlerini, jeneratör fonksiyon bloğunun dışına nasıl çıkaracağız??
 
 ## Aşağıda gösterdiğim örnek ile yakaladığımız promise çözümlerini jeneratör fonksiyon bloğunun dışına çıkarıp tanımlayabilirsiniz. ❤️😎
 
