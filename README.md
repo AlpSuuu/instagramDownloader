@@ -119,8 +119,8 @@ const Logger = Util.logger()
 let logger = new Logger(process);
 
 
-logger.oluştur({ yazı : "Bilgilerine bakmak istediğiniz medyanın linkini giriniz...\r\n", ilkMesaj : true }, cevap_1=> {
-    logger.oluştur({ yazı : "Url nin verisini mi göndermemi istersin medyasını mı? lütfen sadece `veri` ya da `medya` olarak cevap verin!!!\r\n", ilkMedaj : false }, cevap_2 => {
+logger.oluştur("Bilgilerine bakmak istediğiniz medyanın linkini giriniz...\r\n" , cevap_1=> {
+    logger.oluştur("Url nin verisini mi göndermemi istersin medyasını mı? lütfen sadece `veri` ya da `medya` olarak cevap verin!!!\r\n" , cevap_2 => {
         if(!["veri" , "medya"].some(x => cevap_2 === x)) return console.log("lütfen sadece `medya` ya da `veri` yazınız!!!")
 
         let instagram = new Downloader(cevap_1.trim())
@@ -204,28 +204,56 @@ Util.awaiter(this , function* gen() {
     console.log(value) // output : "alpsu <3"
 })
 ```
-## Synchronizer
+## Logger
 ```js
 const Util = new require("./src/index").Util;
+const Logger = Util.logger()
 
-let senkronizer = new (Util.synchronizer());
+let logger = new Logger(process);
 
 /**
- * Bir promise fonksiyonu belirtiyoruz ki sonkronizer'imiz ile Promise.resolve() değerini çekebilelim.
- * @returns {Promise<void>}
+ * CAPTCHA için kod oluşturucu
+ * @returns {String}
  */
-function promiseFunc() {
-    return new Promise((res , rej) => res("alpsu <3"));
+function kodGen(){
+    var a = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".split(""),b = [];  
+    for (var i=0; i<6; i++) { var j = (Math.random() * (a.length-1)).toFixed(0); b[i] = a[j]; }
+    return b;
 }
 
-let resolved = senkronizer.async(callback => Util.awaiter(this , function* () {
-    let value = yield promiseFunc.call(void 0);
+let kod = kodGen()
+let hatalıGiriş = 0;
+let cevaplar = [];
 
-    callback.call(void 0 , value);
-})).call(void 0)
 
-console.log(resolved) // output : alpsu <3
+/**
+ * Util.logger
+ * 
+ * @param {Object} arguments[0] - bir objenin içinde "yazı" ve "ilkMesaj" değerlerini yazın
+ * 
+ * @param {String} arguments[0].yazı - consol'a göndermek istediğiniz mesaj 
+ * @param {Boolean} arguments[0].ilkMesaj - gönderilen mesajdan sonra manuel olarak gönderilen mesaj(lar)
+ * eğer bu değeri true olarak belirtirseniz gönderdiğimiz mesaj'dan sonra yazılan ilk mesajı döndürür
+ * eğer false olarak belirtirseniz gönderdiğimiz mesaj'dan sonra yazılan tüm mesajları döndürür
+ * 
+ * @param {Function} arguments[1] - bu kısma bir fonksiyon giriniz, fonksiyon çağırıldığında değer göndürecek
+ * 
+ * ÖNEMLİ: aşağıdaki iç içe logger'lar kullanacaksınız en içtekinin "ilkMesaj" değeri `false` diğerleri true olmalıdır!!!
+ * > iç içe kullanmanızı tavsite etmem , kullanacaksanız da aşağıdaki gibi kullanmaya özen gösterin! 
+ */
+logger.oluştur({yazı : "Hoşgeldiniz lütfen isminizi giriniz\r\n", ilkMesaj: true} ,function(cevap) {
+    logger.oluştur({yazı : "Hoşgeldiniz : "+`\x1b[32m${cevap}\x1b[0m`+" Bey\n"+`Lütfen şuanda mavi renkle gördüğünüz 6 haneli kodu arasında "-" olmadan konsola yazın!\n\n`+`\x1b[44m${`- KOD : ${kod.join("-")}`}\x1b[0m`+"\n",ilkMesaj : false},cevap_2 => {
+
+        if(cevap_2.toLowerCase() !== kod.join("").toLowerCase()) { 
+            if(hatalıGiriş < 3) console.log(`\x1b[41mHatalı giriş yaptınız lütfen kodu tekrar girin..! Kalan hakkınız ${3 - hatalıGiriş}\x1b[0m`)
+            if(hatalıGiriş >= 3) console.log(`\x1b[41m3 kere hatalı girdiniz! Kimliğiniz Doğrulanamadı!\x1b[0m`) , logger.kapat()
+            hatalıGiriş += 1;
+
+            return;
+        }
+        if(cevap_2.toLowerCase() == kod.join("").toLowerCase()) console.log(`\x1b[32mDoğrulamayı başarıyla tamamladınız. erişiminiz açıldı. ${cevap} bey\x1b[0m`)
+        logger.kapat()
+    });
+});
 ```
-## Logger
-
-
+https://user-images.githubusercontent.com/67225902/153280783-bda064ec-a287-4b4b-a635-a10828ff1b74.mp4
