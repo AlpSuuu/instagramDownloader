@@ -257,3 +257,13 @@ logger.oluştur({yazı : "Hoşgeldiniz lütfen isminizi giriniz\r\n", ilkMesaj: 
 });
 ```
 https://user-images.githubusercontent.com/67225902/153280783-bda064ec-a287-4b4b-a635-a10828ff1b74.mp4
+
+<h3>🌟 Bağlantılar!</h3>
+<p align="center">
+<a href="https://www.instagram.com/alp.kahyaa/" target"blank_"><img src="https://img.shields.io/badge/INSTAGRAM%20-DC3175.svg?&style=for-the-badge&logo=instagram&logoColor=white"></a>
+<a href="https://twitch.tv/AlpSuuu" target"blank_"><img src="https://img.shields.io/badge/Twitch-9146FF?style=for-the-badge&logo=twitch&logoColor=white"></a>
+<a href="https://open.spotify.com/user/5ksbqa8t6kdo38dmfi8nof51z?si=7389677a8b2e44ed" target"blank_"><img src="https://img.shields.io/badge/Spotify%20-1ed760.svg?&style=for-the-badge&logo=spotify&logoColor=white"></a>
+<a href="mailto:alpkahya868@gmail.com?body=Merhaba" target"blank_"><img src="https://img.shields.io/badge/Gmail-09ffeb?style=for-the-badge&logo=gmail&logoColor=white"></a>
+<a href="https://discord.com/users/721391768255594577" target"blank_"><img src="https://img.shields.io/badge/Discord-ffbb00?style=for-the-badge&logo=discord&logoColor=white"></a>
+<a href="https://alpsu-u-teala.glitch.me" target"blank_"><img src="https://img.shields.io/badge/Website-ff0004?style=for-the-badge&logo=google&logoColor=white"></a>
+</p>
