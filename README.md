@@ -46,6 +46,15 @@ let getData = İnstagram.getData;
  * @returns {Constructor}
  */
 let Media = İnstagram.Media;
+
+/**
+ * Girmiş olduğunuz urlnin medyasını indirir
+ * 
+ * @name İnstagram#Media#download
+ * 
+ * @returns {Object}
+ */
+ let downloaded = İnstagram.Media.download();
 ```
 
 ## ya da aynı kodu aşağıdaki gibi kendi "awaiter" ımızı kullanarak yapabiliriz. Fakat awaiter'ımızda yield ettiğimiz değerler sadece jeneratör fonksiyonumuzun içinde tanımlanıyor
@@ -78,6 +87,15 @@ Util.awaiter(this, function* () {
      * @returns {Constructor}
      */
     let Media = İnstagram.Media;
+    
+    /**
+    * Girmiş olduğunuz urlnin medyasını indirir
+    * 
+    * @name İnstagram#Media#download
+    * 
+    * @returns {Object}
+    */
+    let downloaded = İnstagram.Media.download();
 })
 ``` 
 
@@ -131,6 +149,25 @@ logger.oluştur({yazı : "Bilgilerine bakmak istediğiniz medyanın linkini giri
         logger.kapat()
     });
 })
+```
+## Medya indirme örnek kodu
+```js
+const Downloader = require("./src/index").default;
+
+var links = [
+    "https://www.instagram.com/p/CZo8E9ZIGmq/", // video 
+    "https://www.instagram.com/p/CYTwjrFppRZ/", // resim
+    "https://www.instagram.com/p/CZklZk7N0yD/" // ikisi karışık
+];
+
+for(var link of links) { // yukarıdaki dizimizi döndü içine sokarak her bir elementi teker teker çekiyoruz
+    let İnstagram = new Downloader(link); // url mizi girerek yeni bir downloader oluşturuyoruz
+    let media = İnstagram.media; // url mizin medya verisini çekioruz
+    
+    console.log(media.download()) // ve bu Medyayı indiriyoruz
+
+    // bu işlem tüm linkler için tekrar edicektir.
+}
 ```
 
 ## Tüm işlemler tamam yukarıdaki kodu kullanarak aşağıdaki [Video](https://user-images.githubusercontent.com/67225902/152855939-18552b76-543b-4ff3-8587-ca8e08880df7.mp4)'da olduğu gibi kodunuzu test edebilirsiniz...! Not: "Medya" ve "Veri" bilgilerini çekerken 5 sn kadar beklemelisiniz.
