@@ -1,16 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const İnstagram = require("./Error").default;
+const İnstagramError = require("./Error").default;
 
 const axios = require("axios");
 
+
+var yazılar = [];
 class Util {
     /**
      * Util class
      */
     constructor() {
         this.path = require(__dirname +"\\instagram.node");
-    }
+
+        /**
+         * logger ımız için bir consol mesaj dizisi buraya gönderdiğimiz mesajları pushluyoruzx.
+         */
+        this.yazılar = []
+    };
     
      /**
     * belirttiğimiz bir obje ya da herhangi bir nesnenin prototipi arasında property eklememizi sağlar
@@ -329,7 +336,7 @@ class Util {
             * @param {Number} timeout - milisaniye cinsinden işlemi yaptırma süresini yazıyoruz.
             * @param {Function} callback - işlemi yapma süresi geldiğinde çağırılacak fonksiyonumuz.
             */
-            this.wait = this.async(function (timeout, callback) {
+            this.wait = this.async((timeout, callback) => {
                 let args = [];
                 if(callback.arguments) for(var [key , value = callback.arguments[key]] in arguments) args.push(value);
             
@@ -340,79 +347,132 @@ class Util {
             }
         }
     }
-    
-    static logger() { return class {
-        constructor(_process = process) {
-            //super(process);
-    
-            this.process = _process
-            this.giriş = _process.stdin;
-            this.çıkış = _process.stdout;
 
-        }
-    
-        oluştur(yazı , calback) {
-            let Logger = new (Util.logger())(this.process);
-    
-            Logger.çalıştır(yazı  , calback)
-        } 
-    
-         çalıştır(yazı , callback) {
-            if(yazılar.includes(yazı)) return
-            this.gönder(yazı);
-
-    
-            this.sonMesaj("data" , async data => { 
-                let çıktı = this.düzelt(data);
+    /**
+     * @name Util#logger
+     * eğer editörünüzün konsoluna erişiminiz varsa kullanmanızı öneririm bu bir logger
+     * konsola mesaj gönderip o mesaja verilen cevapları çekmeye yarıyor...
+     * 
+     * @returns {Class}
+     */
+    static logger() { 
+        return class Logger {
+            constructor(_process = process) {
+                //super(process);
         
-                callback.call(void 0 , this.mesaj(çıktı))
+                /**
+                 * @name Logger#process
+                 * @type {NodeJS[process]}
+                 */
+                this.process = _process
+                this.giriş = _process.stdin;
+                this.çıkış = _process.stdout;
+
+            }
+        
+            /**
+             * @name Logger#oluştur
+             * yeni bir logger oluşturup logger classımız içindeki çalıştır fonksiyonumuzu çağırır
+             * yeni bir logger oluşturma amacımız artık eski loggerla işimiz bitti ve orda kullandığımız callback fonskiyonumuzu döndürmek istemiyoruz
+             * 
+             * @param {String} yazı - konsola göndermek istediğimiz yazı 
+             * @param {Function} calback - konsola gönderilen mesajımıza konsol üzerinden verilen cevapları döndüreceğimiz fonksiyon 
+             */
+            oluştur(yazı , calback) {
+                let Logger = new (Util.logger())(this.process);
+        
+                Logger.çalıştır(yazı  , calback)
+            } 
+        
+            /**
+             * @name Logger#çalıştır
+             * belirtilen yazıyı konsola atar ve konsola verilen cevapları callback fonskiyonu yardımıyla fonksiyon bloğu içinde döndürür
+             * 
+             * @param {Boolean} ilkMesaj - bu değer konsola yazılan yazından sonra verilen cevaplar ya da cevapları çekmemizi sağlar
+             * eğer true olarak belirtirseniz yalnızca bir adet konsol çıktısını(ilk mesajı) döndürür.
+             * false olarak belirtirseniz gönderilen tüm mesajları döndürür.
+             * 
+             * @param {String} yazı - konsola göndermek istediğimiz yazı 
+             * @param {Function} calback - konsola gönderilen mesajımıza konsol üzerinden verilen cevapları döndüreceğimiz fonksiyon 
+             * 
+             */
+
+            çalıştır({ilkMesaj , yazı}, callback) {
+                if(yazılar.includes(yazı)) return
+                this.gönder(yazı);
                 yazılar.push(yazı);
-            })
-        }
 
-        çalıştır({ilkMesaj , yazı}, callback) {
-            if(yazılar.includes(yazı)) return
-            this.gönder(yazı);
-            yazılar.push(yazı);
+                let { sonMesaj , giriş , mesaj , düzelt} = this
 
-            let { sonMesaj , giriş , mesaj , düzelt} = this
-
-            if(ilkMesaj) return sonMesaj(giriş,düzelt ,mesaj).then(res => callback.call(void 0 , res));
-            else giriş.on("data" , async data => { 
-                let çıktı = this.düzelt(data);
-        
-                callback.call(void 0 , this.mesaj(çıktı))
-            })
-        }
-    
-       
-        gönder(yazı) {
-            this.çıkış.write(yazı);
-        }
-    
-
-        sonMesaj(giriş , düzelt , mesaj) {
-            return new Promise((res , rej) => Util.awaiter(this , function* () {
-                giriş.on("data" , async data => { 
-                    let çıktı = düzelt(data);
+                if(ilkMesaj) return sonMesaj(giriş,düzelt ,mesaj).then(res => callback.call(void 0 , res));
+                else giriş.on("data" , async data => { 
+                    let çıktı = this.düzelt(data);
             
-                    res.call(void 0 , mesaj(çıktı))
+                    callback.call(void 0 , this.mesaj(çıktı))
                 })
-            }))
+            }
+        
+        
+            /**
+             * @name Logger#gönder
+             * konsole belirttiğimiz yazıyı gönderir
+             * 
+             * @param {String} yazı - göndermek istediğimiz yazı
+             */
+            gönder(yazı) {
+                this.çıkış.write(yazı);
+            }
+        
+
+            /**
+             * @name Logger#sonMesaj
+             * konsola mesaj attıktan sonra geri dönüş mesajı olarak konsola manuel olarak gönderilen ilk mesajı bir promise içinde döndürür
+             * 
+             * @param {Object} giriş - projemizin konsol giriş kısmı 
+             * @param {Function} düzelt - Logger#düzelt 
+             * @param {String} mesaj - Logger#mesaj
+             * 
+             * @returns {Promise<void>}
+             */
+            sonMesaj(giriş , düzelt , mesaj) {
+                return new Promise((res , rej) => Util.awaiter(this , function* () {
+                    giriş.on("data" , async data => { 
+                        let çıktı = düzelt(data);
+                
+                        res.call(void 0 , mesaj(çıktı))
+                    })
+                }))
+            }
+        
+            /**
+             * @name Logger#düzelt
+             * yazıyı "Buffer" formundan normal yazı tipine çeviren fonskiyon
+             * 
+             * @param {String} yazı - çevirmöek itediğimiz yazı 
+             * 
+             * @returns {String} 
+             */
+            düzelt(yazı) {
+                return Buffer.from(yazı).toString("utf-8");
+            }
+        
+            /**
+             * @param {String} yazı 
+             * @returns {String}
+             */
+            mesaj(yazı) {
+                return new String(yazı.trim()).toString();
+            }
+        
+            /**
+             * @name Logger#kapat
+             * Loggeri kapatır , konsola serbest bir biçimde mesaj gönderilmesine izin verir ve verilerini çekmez!
+             */
+            kapat() {
+                process.stdin.pause()
+            }
         }
-    
-        düzelt(yazı) {
-            return Buffer.from(yazı).toString("utf-8");
-        }
-    
-        mesaj(yazı) {
-            return new String(yazı.trim()).toString();
-        }
-    
-        kapat() {
-            process.stdin.pause()
-        }
-    }}
+    }
 }
 
 Util.prototyper(exports , "default" , {val : Util})
