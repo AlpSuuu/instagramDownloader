@@ -1,5 +1,9 @@
 "use strict";
+
+const { default: axios } = require("axios");
+
 const Util = require("../Utils/Util").default;
+const fs = require("fs")
 
 Util.prototyper(exports, "__esModule", { val: true });
 
@@ -119,6 +123,17 @@ class Image {
             text : void 0
         }
 
+        /**
+         * @name Image#Image - Resim kaynağı
+         * @type {String}
+         */
+        this.Image = void 0
+
+        /**
+         * @name Image#synchronizer - Senkronizer
+         * @type {Function}
+         */
+        this.synchronizer = new (Util.synchronizer());
 
 
         /**
@@ -152,17 +167,63 @@ class Image {
             profilePicture : data.user.profilePicture,
             verified : data.user.verified,
         };
-        this.caption = {
+        if(data.caption) this.caption = {
             ID : data.caption.ID,
             UserID : data.caption.UserID,
             text : data.caption.text
         }
+        this.Image = data.Image
     }
 
-    download() { 
-        //yakında <3
+    /**
+     * @name Image#createPath
+     * Projeminizin dosyalarını tarar gerekli klasörler mevcut değilse açar mevcutsa ellemez
+     * 
+     * @param {String} mediaID - indirmek istediğimiz medyanın id'si (url - shortCode) 
+     * @param {String | "Medias"} path - indireceğiniz klasör
+     * 
+     * @returns {Promise<void>}
+     */
+    createPath(mediaID , path = "Medias") {
+        return new Promise((resolve , reject) => Util.awaiter(this , function* () {
+            yield fs.access(path , (check) => { 
+                if(check) fs.mkdir(path , (error) => {
+                    if(error) reject.call(void 0 , error)
+                })
+            })
+            yield fs.access(path+"\\"+mediaID , (check) => {
+                if(check) fs.mkdir(path+"\\"+mediaID , (error) => {
+                    if(error) reject.call(void 0 , error)
+                    else resolve.call(void 0 , [process.cwd() , path ,mediaID, "Image.jpg"].join("\\"))
+                }) 
 
-        return false
+                else resolve.call(void 0 , [process.cwd() , path ,mediaID, "Image.jpg"].join("\\"))
+            })
+        }))
+    }
+
+   /**
+    * @name Image#download
+    * 0. argümana belirttiğiniz dosyaya ya da default dosyasına (Medias) medyaları indirir
+    * 
+    * @param {String} $path - indireceğiniz klasör
+    * @returns {Object} 
+    */
+    download($path = "Medias") {
+        let { Image , shortCode , synchronizer , createPath } = this 
+        return synchronizer.async(callback => Util.awaiter(this , function*() {
+            createPath(shortCode , $path).then((path) => Util.awaiter(this , function*() {
+                
+                const writer = fs.createWriteStream(path)
+
+                let executer = yield axios({url : Image , method : 'get' , responseType: 'stream'})
+    
+                executer.data.pipe(writer)
+        
+                writer.on('finish', () => callback.call(void 0 , { statusMessage : `Download is sucsess!` , File : path}));
+                writer.on('error', () => callback.call(void 0 , { statusMessage : `Download is unsucsess!` , File : void 0}));    
+            }))
+        }))()
     }
 }
 
