@@ -12,10 +12,11 @@ let logger = new Logger(process);
 
         let instagram = new Downloader(cevap_1.trim())
 
-        if(cevap_2.toLowerCase() === "veri") console.log("Belirttiğiniz Urlnin bilgileri gönderiliyor...\n") , console.log(instagram.getData);
+        if(cevap_2.toLowerCase() === "veri") console.log("Belirttiğiniz Urlnin bilgileri gönderiliyor...\n") , console.log(instagram.getData)
         if(cevap_2.toLowerCase() === "medya") console.log("Belirttiğiniz Urlnin Mediya bilgileri gönderiliyor...\n") , console.log(instagram.Media);
+        
+        console.log("Logger'ı kapatarak konsola serbest mesaj iznini açtım")
 
         logger.kapat()
     });
 })
-    
