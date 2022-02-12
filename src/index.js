@@ -62,7 +62,7 @@ class İnstagramDownloader  {
     _getData(ID = this.VideoID) {
         return synchronizer.async(callback => Util.awaiter(this , function*() {
             let url = Util.createNewURL(ID)
-            let { data } = yield Util.fetcher.get(url);
+            let { data } = yield Util.fetcher.get(url).catch(err => { new İnstagramError("Connection failed pls try again later.." , "ConnectionError") });
 
             if(!data || !data?.items) throw new İnstagramError(`no data found for "${ID}"` , "HttpError")
 
@@ -116,8 +116,8 @@ class İnstagramDownloader  {
      * @returns {Object}
      */
     get getData() {
+        let ID = this.VideoID
         return synchronizer.async(callback => Util.awaiter(this , function*() {
-            let ID = this.VideoID
             let url = Util.createNewURL(ID)
             let { data } = yield Util.fetcher.get(url);
 
@@ -166,6 +166,7 @@ class İnstagramDownloader  {
                         width : data.original_width,
                         height : data.original_height
                     },
+
                     user : {
                         ID : data.user.pk,
                         username : data.user.username,
@@ -174,11 +175,14 @@ class İnstagramDownloader  {
                         profilePicture : data.user.profile_pic_url,
                         verified : data.user.is_verified,
                     },
-                    caption : {
-                        ID : data.caption.pk,
-                        UserID : data.caption.user_id,
-                        text : String(data.caption.text)
-                    }
+
+                    caption : data.caption ? {
+                        ID : data?.caption?.pk || null,
+                        UserID : data?.caption?.user_id || null,
+                        text : String(data?.caption?.text || null)
+                    } : null,
+
+                    Image : data.image_versions2.candidates[0].url
                 })
             };
             case "sidecar": {
@@ -189,6 +193,7 @@ class İnstagramDownloader  {
                     shortCode : data.code,
                     commentCount : data.like_count,
                     likeCount : data.comment_count,
+
                     user : {
                         ID : data.user.pk,
                         username : data.user.username,
@@ -197,11 +202,13 @@ class İnstagramDownloader  {
                         profilePicture : data.user.profile_pic_url,
                         verified : data.user.is_verified,
                     },
-                    caption : {
-                        ID : data.caption.pk,
-                        UserID : data.caption.user_id,
-                        text : String(data.caption.text)
-                    },
+
+                    caption : data.caption ? {
+                        ID : data?.caption?.pk || null,
+                        UserID : data?.caption?.user_id || null,
+                        text : String(data?.caption?.text || null)
+                    } : null,
+
                     medias : data.carousel_media.map(data => {
                         return {
                             ID : data.id,
@@ -226,6 +233,7 @@ class İnstagramDownloader  {
                         width : data.original_width,
                         height : data.original_height
                     },
+
                     user : {
                         ID : data.user.pk,
                         username : data.user.username,
@@ -234,11 +242,13 @@ class İnstagramDownloader  {
                         profilePicture : data.user.profile_pic_url,
                         verified : data.user.is_verified,
                     },
-                    caption : {
-                        ID : data.caption.pk,
-                        UserID : data.caption.user_id,
-                        text : String(data.caption.text)
-                    },
+
+                    caption : data.caption ? {
+                        ID : data?.caption?.pk || null,
+                        UserID : data?.caption?.user_id || null,
+                        text : String(data?.caption?.text || null)
+                    } : null,
+
                     Video : {
                         width : data.video_versions[0].width,
                         height : data.video_versions[0].height,
@@ -283,11 +293,13 @@ class İnstagramDownloader  {
                     profilePicture : data.user.profile_pic_url,
                     verified : data.user.is_verified,
                 },
-                caption : {
-                    ID : data.caption.pk,
-                    UserID : data.caption.user_id,
-                    text : String(data.caption.text)
-                }
+                caption : data.caption ? {
+                    ID : data?.caption?.pk || null,
+                    UserID : data?.caption?.user_id || null,
+                    text : String(data?.caption?.text || null)
+                } : null,
+
+                Image : data.image_versions2.candidates[0].url
             }))
 
             if(type === "video") return resolve(new Video({
@@ -301,6 +313,7 @@ class İnstagramDownloader  {
                     width : data.original_width,
                     height : data.original_height
                 },
+
                 user : {
                     ID : data.user.pk,
                     username : data.user.username,
@@ -309,11 +322,13 @@ class İnstagramDownloader  {
                     profilePicture : data.user.profile_pic_url,
                     verified : data.user.is_verified,
                 },
-                caption : {
-                    ID : data.caption.pk,
-                    UserID : data.caption.user_id,
-                    text : String(data.caption.text)
-                },
+
+                caption : data.caption ? {
+                    ID : data?.caption?.pk || null,
+                    UserID : data?.caption?.user_id || null,
+                    text : String(data?.caption?.text || null)
+                } : null,
+
                 Video : {
                     width : data.video_versions[0].width,
                     height : data.video_versions[0].height,
@@ -328,6 +343,7 @@ class İnstagramDownloader  {
                 shortCode : data.code,
                 commentCount : data.like_count,
                 likeCount : data.comment_count,
+
                 user : {
                     ID : data.user.pk,
                     username : data.user.username,
@@ -336,11 +352,13 @@ class İnstagramDownloader  {
                     profilePicture : data.user.profile_pic_url,
                     verified : data.user.is_verified,
                 },
-                caption : {
-                    ID : data.caption.pk,
-                    UserID : data.caption.user_id,
-                    text : String(data.caption.text)
-                },
+
+                caption : data.caption ? {
+                    ID : data?.caption?.pk || null,
+                    UserID : data?.caption?.user_id || null,
+                    text : String(data?.caption?.text || null)
+                } : null,
+
                 medias : data.carousel_media.map(data => {
                     return {
                         ID : data.id,
@@ -350,6 +368,7 @@ class İnstagramDownloader  {
                         height: data.original_height
                     }
                 }),
+
                 mediaSize : data.carousel_media.length
             }))
         })
@@ -358,3 +377,4 @@ class İnstagramDownloader  {
 
 void Util.prototyper(exports , "default" , {val : İnstagramDownloader});
 void Util.prototyper(exports , "Util" , { val : Util })
+
