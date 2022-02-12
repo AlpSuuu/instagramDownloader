@@ -155,9 +155,9 @@ logger.oluştur({yazı : "Bilgilerine bakmak istediğiniz medyanın linkini giri
 const Downloader = require("./src/index").default;
 
 var links = [
-    "https://www.instagram.com/p/CZo8E9ZIGmq/", // video 
-    "https://www.instagram.com/p/CYTwjrFppRZ/", // resim
-    "https://www.instagram.com/p/CZklZk7N0yD/" // ikisi karışık
+    "https://www.instagram.com/p/CZo8E9ZIGmq/",// ikisi karışık
+    "https://www.instagram.com/p/CXGhz24j-jy/", // video 
+    "https://www.instagram.com/p/CZklZk7N0yD/" // resim
 ];
 
 for(var link of links) { // yukarıdaki dizimizi döndü içine sokarak her bir elementi teker teker çekiyoruz
