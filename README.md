@@ -4,12 +4,18 @@ basit bir instagram media indirme projesi.
 ## Lisans
 [MIT License](https://github.com/AlpSuuu/instagramDownloader/blob/main/LICENSE)
 
+## İndirme
+```
+npm install instagram-url-downloader
+git clone https://github.com/AlpSuuu/instagramDownloader.git
+```
+
 ## Tanımlamlar
 # Downloader ve Util class'larımızı tanımlıyoruz
 
 ```js
-const Downloader = require("./src/index").default;
-const Util = require("./src/index").Util;
+const Downloader = require("instagram-url-downloader").default;
+const Util = require("instagram-url-downloader").Util;
 ```
 # Yeni bir downloader oluşturup url mizi giriyoruz
 ```js
@@ -129,8 +135,6 @@ console.log(instagramData) // output : Object { ... } - İnstagramData
 ### Deneme Kodu;
 
 ```js
-const Downloader = require("../src/index").default;
-const Util = new require("../src/index").Util;
 const Logger = Util.logger()
 
 
@@ -178,7 +182,7 @@ https://user-images.githubusercontent.com/67225902/152855939-18552b76-543b-4ff3-
 
 ## Prototyper
 ```js
-const Util = new require("./src/index").Util;
+const Util = new require("instagram-url-downloader").Util;
 
 let object = new Object({})
 
@@ -217,7 +221,7 @@ console.log(["a" , "l" , "p" , "s" , "u" , "<3"].değerSayısı()) // output : 6
 ```
 ## Awaiter
 ```js
-const Util = new require("./src/index").Util;
+const Util = new require("instagram-url-downloader").Util;
 
 /**
  * Bir promise fonksiyonu belirtiyoruz ki awaiter'ımız ile await kullanmadan değeri çekebilelim.
@@ -243,7 +247,7 @@ Util.awaiter(this , function* gen() {
 ```
 ## Logger
 ```js
-const Util = new require("./src/index").Util;
+const Util = new require("instagram-url-downloader").Util;
 const Logger = Util.logger()
 
 let logger = new Logger(process);
