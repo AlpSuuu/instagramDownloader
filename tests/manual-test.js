@@ -1,4 +1,4 @@
-const Downloader = require("./src/index").default;
+const Downloader = require("../src/index").default;
 
 var links = [
     "https://www.instagram.com/p/CZo8E9ZIGmq/",// ikisi karışık
