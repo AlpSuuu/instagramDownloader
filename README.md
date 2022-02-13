@@ -154,8 +154,6 @@ let logger = new Logger(process);
 ```
 ## Medya indirme örnek kodu
 ```js
-const Downloader = require("./src/index").default;
-
 var links = [
     "https://www.instagram.com/p/CZo8E9ZIGmq/",// ikisi karışık
     "https://www.instagram.com/p/CXGhz24j-jy/", // video 
