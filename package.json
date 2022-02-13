@@ -1,5 +1,5 @@
 {
-  "name": "instagramDownloader",
+  "name": "instagram-url-downloader",
   "version": "1.0.0",
   "description": "Basit bir instagram downloader",
   "main": "src/index.js",
