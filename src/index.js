@@ -1,13 +1,17 @@
 'use strict';
+
 const Util = require("./Utils/Util").default
 const İnstagramError = require("./Utils/Error").default;
 
+//senkronizer <3
 const synchronizer = new (Util.synchronizer());
 
 //structures larımız
-const Image = require("./Structures/Image").default
-const Video = require("./Structures/Video").default
-const Sidecar = require("./Structures/Sidecar").default
+const { default: Image } = require("./Structures/Image")
+const { default: Video } = require("./Structures/Video")
+const { default: Sidecar} = require("./Structures/Sidecar")
+const { default: User }= require("./Structures/User")
+const { default: Story } = require("./Structures/Story");
 
 //databasemiz
 const Database = require("./Utils/Database/Database").default;
@@ -62,7 +66,7 @@ class İnstagramDownloader  {
     _getData(ID = this.VideoID) {
         return synchronizer.async(callback => Util.awaiter(this , function*() {
             let url = Util.createNewURL(ID)
-            let { data } = yield Util.fetcher.get(url).catch(err => { new İnstagramError("Connection failed pls try again later.." , "ConnectionError") });
+            let { data } = yield Util.fetcher.get(url).catch(err => { Util.error(err) });
 
             if(!data || !data?.items) throw new İnstagramError(`no data found for "${ID}"` , "HttpError")
 
@@ -89,7 +93,7 @@ class İnstagramDownloader  {
      */
     get VideoID() {
         let URL = String(this.Url.split("/?__a=1")[0]);
-        URL = URL.split("/")[URL.split("/").length - 1]
+        URL = URL.split("/").pop()
         
         return URL
     }
@@ -103,7 +107,7 @@ class İnstagramDownloader  {
     get asyncData() {
         let url = this.Url
         return new Promise((resolveData , reject) => Util.awaiter(this , function* () {
-            let { data:{ items } } = yield Util.fetcher.get(Util.FixedUrl(url)).catch(() => { });
+            let { data:{ items } } = yield Util.fetcher.get(Util.FixedUrl(url)).catch(err => { Util.error(err) });
             if(!items) return reject("bulunamadı");
 
             resolveData(items)
@@ -119,7 +123,7 @@ class İnstagramDownloader  {
         let ID = this.VideoID
         return synchronizer.async(callback => Util.awaiter(this , function*() {
             let url = Util.createNewURL(ID)
-            let { data } = yield Util.fetcher.get(url);
+            let { data } = yield Util.fetcher.get(url).catch(err => { Util.error(err) });
 
             if(!data || !data?.items) throw new İnstagramError(`no data found for "${ID}"` , "HttpError")
 
@@ -156,7 +160,7 @@ class İnstagramDownloader  {
         switch(type) {
             case "image": {
                 return new Image({
-                    takenDate : (new Date(data.taken_at)).toLocaleDateString('en-GB'),
+                    takenDate : (new Date(Date(data.taken_at))).toLocaleString(),
                     ID : data.pk,
                     MediaType : type,
                     shortCode : data.code,
@@ -187,7 +191,7 @@ class İnstagramDownloader  {
             };
             case "sidecar": {
                 return new Sidecar({
-                    takenDate : (new Date(data.taken_at)).toLocaleDateString('en-GB'),
+                    takenDate : (new Date(Date(data.taken_at))).toLocaleString(),
                     ID : data.pk,
                     MediaType : type,
                     shortCode : data.code,
@@ -223,7 +227,7 @@ class İnstagramDownloader  {
             };
             case "video": {
                 return new Video({
-                    takenDate : (new Date(data.taken_at)).toLocaleDateString('en-GB'),
+                    takenDate : (new Date(Date(data.taken_at))).toLocaleString(),
                     ID : data.pk,
                     MediaType : type,
                     shortCode : data.code,
@@ -259,8 +263,14 @@ class İnstagramDownloader  {
         }
     }
     
+   /**
+    * girmiş olduğunuz instagram urlsinin sahip olduğunu medyayı verir 
+    * 
+    * @returns {Promise<void>}
+    */
+
     get asyncMedia() {
-        let data = this
+        let {data} = this
         return new Promise((resolve , reject) => {
 
             let type = function() {
@@ -275,7 +285,7 @@ class İnstagramDownloader  {
             }()
 
             if(type === "image") return resolve(new Image({
-                takenDate : (new Date(data.taken_at)).toLocaleDateString('en-GB'),
+                takenDate : (new Date(Date(data.taken_at))).toLocaleString(),
                 ID : data.pk,
                 MediaType : type,
                 shortCode : data.code,
@@ -303,7 +313,7 @@ class İnstagramDownloader  {
             }))
 
             if(type === "video") return resolve(new Video({
-                takenDate : (new Date(data.taken_at)).toLocaleDateString('en-GB'),
+                takenDate : (new Date(Date(data.taken_at))).toLocaleString(),
                 ID : data.pk,
                 MediaType : type,
                 shortCode : data.code,
@@ -337,7 +347,7 @@ class İnstagramDownloader  {
             }))
             
             if(type === "sidecar") resolve(new Sidecar({
-                takenDate : (new Date(data.taken_at)).toLocaleDateString('en-GB'),
+                takenDate : (new Date(Date(data.taken_at))).toLocaleString(),
                 ID : data.pk,
                 MediaType : type,
                 shortCode : data.code,
@@ -373,8 +383,115 @@ class İnstagramDownloader  {
             }))
         })
     }  
+
+    /**
+     * classımızı oluştururken girdiğimiz instagram url sini yayınlayan kullanıcı  bilgileri 
+     * 
+     * @returns {User}
+     */
+    get getUser() {
+        let name = this.getData.user.username
+        return synchronizer.async(callback => Util.awaiter(this , function*() {
+            let { data } = yield Util.fetcher.get(`https://www.instagram.com/${name}/?__a=1`).catch(err => { Util.error(err) });
+
+            const user = data.graphql.user;
+
+            let obj = {
+                categories : data.seo_category_infos.map(arr => { return arr.pop() }),
+                ID : user.id,
+                username : user.username,
+                fullname : user.full_name,
+                profilePicture : user.profile_pic_url_hd,
+                privateAcc : user.is_private,
+                verifiedAcc : user.is_verified,
+                mediaSize : user.edge_owner_to_timeline_media.count,
+                followers : user.edge_followed_by.count,
+                following : user.edge_follow.count,
+                biography : user.biography,
+                reels : user.highlight_reel_count,
+                address : user.business_address_json,
+                mail : user.business_email,
+                number : user.business_phone_number,
+                category : user.category_name,
+                reels : user.highlight_reel_count,
+                business : user.is_business_account,
+                professional : user.is_professional_account,
+                medias : user.is_private ? "X Private Acc X" : user.edge_owner_to_timeline_media.edges.map(({node}) => {
+                    return {
+                        type : {GraphSidecar : "Sidecar" , GraphVideo : "Video" , GraphImage : "Image"}[node.__typename],
+                        url : `https://www.instagram.com/p/${node.shortcode}`,
+                        displayUrl : node.display_url,
+                        takenAt : new Date(Date(node.taken_at_timestamp)).toLocaleString(),
+                        taggedUsers : node.edge_media_to_tagged_user.edges.map(user => { return `https://www.instagram.com/${user.username}`}),
+                        likeCount : node.edge_media_preview_like.count,
+                        commentCount : node.edge_media_to_comment.count,
+                    }
+                }),
+            }
+            const _class = new User(obj) 
+
+            callback.call(void 0 , _class)
+        }))()
+    }
+
+    /**
+     * classımızı oluştururken girdiğimiz instagram url sini yayınlayan kullanıcının story bilgileri 
+     * 
+     * @returns {Story}
+     */
+    get getUserStories() {
+        let id = this.getData.user.pk
+        return synchronizer.async(callback => Util.awaiter(this , function*() {
+            let { data } = yield Util.fetcher.get(`https://i.instagram.com/api/v1/feed/user/${id}/reel_media/`).catch(err => { Util.error(err) });
+            let check = data.user.is_private;
+
+            if(check) throw new İnstagramError("account private");
+
+            let arr = data.items.map(story => {
+                return {
+                    takenAt : new Date(Date(story.taken_at)).toLocaleString(),
+                    endAt : new Date(Date(story.expiring_at)).toLocaleString(),
+                    type : [0 , "Image" , "Video"][story.media_type],
+                    caption : story.caption,
+                    media :  {
+                        url : story.media_type === 1 ? story.image_versions2.candidates[0].url : story.video_versions[0].url,
+                        width : story.original_width,
+                        height : story.original_height
+                    }
+                }
+            })
+
+            let stroies = new Story({
+                user : {
+                    ID : data.user.pk,
+                    username : data.user.username,
+                    fullName : data.user.full_name,
+                    privateAcc : data.user.is_private,
+                    profilePicture : data.user.profile_pic_url,
+                },
+                stories : arr
+            })
+
+            callback.call(void 0 , stroies)
+        }))()
+    }
 }
 
-void Util.prototyper(exports , "default" , {val : İnstagramDownloader});
-void Util.prototyper(exports , "Util" , { val : Util })
+let map = new Map([
+    ['downloader' , İnstagramDownloader],
+    ['fetchUser' , Util.getUser],
+    ['fetchStories' , Util.Stories],
+    ['fetchHighlights' , Util.getHighlights],
+    ['Util' , Util],
+])
 
+let obj = {};
+for(var [key , value] of map) {
+    void Util.prototyper(obj , key , { val : value })
+}
+
+
+// exports objemize property ekliyox
+for(var [ key , value] of map) {
+    void Util.prototyper(exports , key , { val : value })
+}

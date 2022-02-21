@@ -1,7 +1,7 @@
 {
   "name": "instagram-url-downloader",
-  "version": "1.0.0",
-  "description": "Basit bir instagram downloader",
+  "version": "1.0.6",
+  "description": "instagram downloader",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,7 +9,33 @@
   "bugs": {
     "url": "https://github.com/AlpSuuu/instagramDownloader/issues"
   },
-  "keywords": ["alpsu<3"],
+  "keywords": [
+    "alpsu<3",
+    "instagram",
+    "downloader",
+    "saver",
+    "save",
+    "download",
+    "instagram-url",
+    "media",
+    "url-downloader",
+    "instagram-scrapper",
+    "instagram-scraping",
+    "instagram-api",
+    "url-direct",
+    "easy-download",
+    "download-and-save",
+    "instagram-downloader",
+    "video",
+    "ımage",
+    "instagram-medya-indir",
+    "fetcher",
+    "insta"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlpSuuu/instagramDownloader.git"
+  },
   "author": "https://github.com/AlpSuuu/",
   "license": "MIT",
   "dependencies": {

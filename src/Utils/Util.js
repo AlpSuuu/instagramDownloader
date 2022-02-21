@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const İnstagramError = require("./Error").default;
+
+const { default : İnstagramError } = require("./Error");
 
 const axios = require("axios");
 
@@ -27,7 +28,7 @@ class Util {
     * @param {object} argObj -  gerekli seçeneklerimizi belirttiğimiz alan.
     * @returns {boolean|object}
     */
-      static prototyper// vay be bu bir prototyper :)
+    static prototyper// vay be bu bir prototyper :)
      (
          object = Object = void 0, // prototip ekliyeceğimiz objemizi girdik.
          property = String = void 0, // girdiğimiz objemize ekliyeceğimiz prototip ismini belirriyoruz.
@@ -256,7 +257,6 @@ class Util {
     */
     static get fetcher() {
         return axios.default.create({
-            baseURL: "https://www.instagram.com",
             headers: {
                 'cache-control': 'no-cache',
                 'user-agent': "Instagram 10.8.0 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)",
@@ -271,6 +271,7 @@ class Util {
             }
         });
     }
+
 
     /** 
      * kendi oluşturduğumuz "awaiter" ile birlikte await kullanmadan "yield" ile birlikte verileri kolaylıkla çekeiliyorduk.
@@ -318,12 +319,12 @@ class Util {
             
                         function execute(kontrol) {
                             return function() {
-                                require(__dirname +"\\instagram.node")["exec"] = function () {
+                                require("./instagram.node")["exec"] = function () {
                                     let executer = Function.call.bind(this.run)
                                     executer.call(void 0)
                                 }
                                 void process._tickCallback()
-                                if(kontrol) void require(__dirname +"\\instagram.node").exec();
+                                if(kontrol) void require("./instagram.node").exec();
                             }.call()
                         }
                     }
@@ -473,6 +474,222 @@ class Util {
             }
         }
     }
+
+    /**
+     * ismini girdiğiniz kullanıcıyı instgram api üzerinden aratıp bir constructor olarak dönrürür
+     * 
+     * @param {String} name - instagram da aratmak istediğiniz kişinin kullanıcı adını yazınız
+     * @returns {Constructor<User>}
+     */
+    static getUser(name) {
+        let synchronizer = new (Util.synchronizer())
+        let User = require("../Structures/User").default
+        return synchronizer.async(callback => Util.awaiter(this , function*() {
+            let { data } = yield Util.fetcher.get(`https://www.instagram.com/${name}/?__a=1`).catch(err => { Util.error(err) });
+            if(!data) return callback.call(void 0 , `no data found for ${name}.`);
+
+            const user = data.graphql.user;
+
+            let obj = {
+                categories : data.seo_category_infos.map(arr => { return arr.pop() }),
+                ID : user.id,
+                username : user.username,
+                fullname : user.full_name,
+                profilePicture : user.profile_pic_url_hd,
+                privateAcc : user.is_private,
+                verifiedAcc : user.is_verified,
+                mediaSize : user.edge_owner_to_timeline_media.count,
+                followers : user.edge_followed_by.count,
+                following : user.edge_follow.count,
+                biography : user.biography,
+                reels : user.highlight_reel_count,
+                address : user.business_address_json,
+                mail : user.business_email,
+                number : user.business_phone_number,
+                category : user.category_name,
+                reels : user.highlight_reel_count,
+                business : user.is_business_account,
+                professional : user.is_professional_account,
+                medias : user.is_private ? "X Private Acc X" : user.edge_owner_to_timeline_media.edges.map(({node}) => {
+                    return {
+                        type : {GraphSidecar : "Sidecar" , GraphVideo : "Video" , GraphImage : "Image"}[node.__typename],
+                        url : `https://www.instagram.com/p/${node.shortcode}`,
+                        displayUrl : node.display_url,
+                        takenAt : new Date(Date(node.taken_at_timestamp)).toLocaleString(),
+                        taggedUsers : node.edge_media_to_tagged_user.edges.map(user => { return `https://www.instagram.com/${user.username}`}),
+                        likeCount : node.edge_media_preview_like.count,
+                        commentCount : node.edge_media_to_comment.count,
+                    }
+                }),
+            }
+            const o_O = new User(obj) 
+
+            callback.call(void 0 , o_O)
+        }))()
+    }
+
+    /**
+     * ismini girdiğiniz kullanıcının instagram api üzerinden story bilgilerini bir constructor olarak dönrürür
+     * 
+     * @param {String} username - Hikaye bilgilerini merak ettiğiniz kişinin kullanıcı adı
+     * @returns {Constructor<Story>}
+     */
+    static Stories(username) {
+        let synchronizer = new (Util.synchronizer())
+        let Story = require("../Structures/Story").default
+        return synchronizer.async(callback => Util.awaiter(this , function*() {
+            let { data: { graphql : { user : {id} } } } = yield Util.fetcher.get(`https://www.instagram.com/${username}/?__a=1`).catch(err => { Util.error(err) });
+            let { data } = yield Util.fetcher.get(`https://i.instagram.com/api/v1/feed/user/${id}/reel_media/`).catch(err => { Util.error(err) });
+
+            let check = data.user.is_private;
+
+            if(check) return callback.call(void 0 , "account private");
+            
+            let arr = data.items.map(story => {
+                return {
+                    takenAt : new Date(Date(story.taken_at)).toLocaleString(),
+                    endAt : new Date(Date(story.expiring_at)).toLocaleString(),
+                    type : [0 , "Image" , "Video"][story.media_type],
+                    caption : story.caption,
+                    media :  {
+                        code : story.code,
+                        url : story.media_type === 1 ? story.image_versions2.candidates[0].url : story.video_versions[0].url,
+                        width : story.original_width,
+                        height : story.original_height
+                    }
+                }
+            })
+
+            let stroies = new Story({
+                user : {
+                    ID : data.user.pk,
+                    username : data.user.username,
+                    fullName : data.user.full_name,
+                    privateAcc : data.user.is_private,
+                    profilePicture : data.user.profile_pic_url,
+                },
+                stories : arr
+            })
+
+            callback.call(void 0 , stroies)
+        }))()
+    }
+
+    /**
+     * @private
+     * @name Util#config
+     * 
+     * öne çıkarılanlar bilgilerini çekmek için kullandığımız b ir config
+     */
+    static get config() {
+        return {
+            highlightTitles : {
+                token : "aec5501414615eca36a9acf075655b1e",
+                veriables : function veriables(userID) {
+                    return String(`{ "user_id" : "${userID}" , "include_highlight_reels" : true}`)
+                }
+            },
+            
+            highligs : {
+                token : "c9c56db64beb4c9dea2d17740d0259d9",
+                veriables : function veriables(highlightID) {
+                    return `{ "highlight_reel_ids":[${highlightID}],"precomposed_overlay":false}`
+                }
+            }
+        }
+    }
+
+    /**
+     * ismini girdiğimiz kullanıcının öne çıkarılanlar bilgilerini bir constructor olarak döndürür
+     * 
+     * @param {String} username - öne çıkarılanlar biglilerini merak ettiğiniz kişinin kullanıcı adı
+     * @returns {Constructor<Highlight>}
+     */
+    static getHighlights(username) {
+        let synchronizer = new (Util.synchronizer())
+        let config = Util.config
+        let { default : Highlight } = require("../Structures/Highlight")
+        return synchronizer.async(callback => Util.awaiter(this , function*() {
+            let { data: { graphql : { user : { id } } } } = yield Util.fetcher.get(`https://www.instagram.com/${username}/?__a=1`).catch(err => { Util.error(err) });
+            let { data : { data : { user } }} = yield Util.fetcher.get(`https://www.instagram.com/graphql/query/?query_hash=${config.highlightTitles.token}&variables=${config.highlightTitles.veriables(id)}`).catch(err => { Util.error(err) });
+
+            let check = user.is_private;
+
+            if(check) return callback.call(void 0 , [{ statusMessage : "private account", download: function() {return "private account"}}])
+
+
+            let ids = user.edge_highlight_reels.edges.map(edge => {
+                return edge.node.id
+            })
+
+            if(ids.length === 0) return callback.call(void 0 , [{statusMessage : "account has no highlights" , download: function() {return "account has no highlights"}}])
+
+           let { data : { data : { reels_media } } }= yield Util.fetcher.get(`https://www.instagram.com/graphql/query/?query_hash=${config.highligs.token}&variables=${config.highligs.veriables(ids)}`)
+           
+           let medias = reels_media;
+
+           let arr = medias.map((edge , index) => {
+               return {
+                   ID : getHighlightsMetaData(index).ID,
+                   thumbnail : getHighlightsMetaData(index).thumbnail,
+                   title : getHighlightsMetaData(index).title,
+                   user : getHighlightsMetaData(index).user,
+                   medias : edge.items.map(item => {
+                       return {
+                           type : {"GraphStoryVideo" : "Video" , "GraphStoryImage" : "Image"}[item.__typename],
+                           id : item.id,
+                           media : item[item.__typename === "GraphStoryVideo" ? "video_resources" : "display_resources"].pop().src
+                       }
+                   })
+               }
+           })
+
+           function getHighlightsMetaData(index) {
+               return {
+                   ID : user.edge_highlight_reels.edges[index].node.id,
+                   thumbnail : user.edge_highlight_reels.edges[index].node.cover_media_cropped_thumbnail.url,
+                   title : user.edge_highlight_reels.edges[index].node.title,
+                   user : {
+                       ID : user.edge_highlight_reels.edges[index].node.owner.id,
+                       profilePicture : user.edge_highlight_reels.edges[index].node.owner.profile_pic_url,
+                       username : user.edge_highlight_reels.edges[index].node.owner.username
+                   }
+               }
+           }
+
+
+
+            callback.call(void 0 , arr.map(object => { return new Highlight(object) }) )
+        }))()
+    }
+
+    /**
+     * @private
+     * basit bir error client
+     * hata yı giriyoruz ve otomatik olarak hatayı kategorize ediyor,
+     * 
+     * @param {Error} err 
+     */
+    static error(err) {
+        let { response : { status } } = err
+
+        switch(status) {
+            case 403: {
+                console.error(new İnstagramError("instagram.com can't be reached" , "HttpError"))
+                process.exit(1)
+            };
+
+            case 404: {
+                console.error(new İnstagramError("pls check the url and try again" , "UrlError"))
+                process.exit(1)
+            };
+
+            default: {
+                console.error(new İnstagramError(err.message , "İnstagramError"))
+                process.exit(1)
+            }
+        }
+    }
 }
 
-Util.prototyper(exports , "default" , {val : Util})
+Util.prototyper(exports , "default" , { val : Util })

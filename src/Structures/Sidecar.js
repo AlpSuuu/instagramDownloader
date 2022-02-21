@@ -1,7 +1,7 @@
 "use strict";
 const { default: axios } = require("axios");
+const { default: Util } = require("../Utils/Util");
 
-const Util = require("../Utils/Util").default;
 const fs = require("fs")
 
 Util.prototyper(exports, "__esModule", { val: true });
@@ -124,7 +124,6 @@ class Sidecar {
          * @name Image#synchronizer - Senkronizer
          * @type {Function}
          */
-        this.synchronizer = new (Util.synchronizer());
 
         /**
          * fonksiyonumuzu çağırıyoruz ki datayı kolaylıkla ayrıştıralım ve property leri tanımlayalım 
@@ -162,6 +161,11 @@ class Sidecar {
         this.medias = data.medias
     }
 
+
+    get synchronizer() {
+        return new (Util.synchronizer());
+    }
+
     createPath(mediaID , path = "Medias", name) {
         return new Promise((resolve , reject) => Util.awaiter(this , function* () {
             yield fs.access(path , (check) => { 
@@ -186,7 +190,7 @@ class Sidecar {
     * 0. argümana belirttiğiniz dosyaya ya da default dosyasına (Medias) medyaları indirir
     * 
     * @param {String} $path - indireceğiniz klasör
-    * @returns {Object} 
+    * @returns {Array<Object>} 
     */
     download($path = "Medias") {
         let { medias , downloadVideo , downloadImage , shortCode , synchronizer , createPath } = this
@@ -219,7 +223,7 @@ class Sidecar {
                         
                 const writer = fs.createWriteStream(path)
 
-                let executer = yield axios({url : media.media , method : 'get' , responseType: 'stream'})
+                let executer = yield axios({url : media.media , method : 'get' , responseType: 'stream'}).catch(err => { Util.error(err) });
 
                 executer.data.pipe(writer)
         
@@ -247,7 +251,54 @@ class Sidecar {
                         
                 const writer = fs.createWriteStream(path)
 
-                let executer = yield axios({url : media.media , method : 'get' , responseType: 'stream'})
+                let executer = yield axios({url : media.media , method : 'get' , responseType: 'stream'}).catch(err => { Util.error(err) });
+
+                executer.data.pipe(writer)
+        
+                writer.on('finish', () => callback.call(void 0 , { statusMessage : `Download is sucsess!` , File : path}));
+                writer.on('error', () => callback.call(void 0 , { statusMessage : `Download is unsucsess!` , File : void 0}));    
+            }))
+        }))()
+    }
+
+   /**
+    * @name Sidecar#audioDownload
+    * 0. argümana belirttiğiniz dosyaya ya da default dosyasına (Medias) medyaların seslerini indirir
+    * 
+    * @param {String} $path - indireceğiniz klasör
+    * @returns {Array<Object>} 
+    */
+    audioDownload($path = "Medias") {
+        let { medias , downloadVideoAudio , shortCode , synchronizer , createPath } = this
+        return synchronizer.async(callback => Util.awaiter(this , function*() {
+            let arr = [];
+            yield medias.forEach((media , index) => {
+                if(media.type == "Video") return arr.push(downloadVideoAudio(index , media , synchronizer , createPath , shortCode , $path));
+            })
+
+            callback.call(void 0 , arr)
+        }))()
+    }
+
+    /**
+     * @name Sidecar#downloadVideoAudio
+     * 
+     * @param {Number} index - medyaları birbirinden ayırmak için kullandığımız için medyaların pozisyonları 
+     * @param {Object} media - medyamızın bilgileri 
+     * @param {Function} synchronizer - util de kullandığımız kendi senkronizerimiz 
+     * @param {Function} createPath - Sidecar#createPath
+     * @param {String} shortCode - Sidecar#shortCode
+     * @param {String} $path - indireceğiniz klasör
+     * 
+     * @returns {Object}
+     */
+    downloadVideoAudio(index , media , synchronizer , createPath , shortCode , $path) {
+        return synchronizer.async(callback => Util.awaiter(this , function*() {
+            createPath(shortCode , $path ,`Video(${index+1})-audio.mp3`).then((path) => Util.awaiter(this , function*() {
+                        
+                const writer = fs.createWriteStream(path)
+
+                let executer = yield axios({url : media.media , method : 'get' , responseType: 'stream'}).catch(err => { Util.error(err) });
 
                 executer.data.pipe(writer)
         

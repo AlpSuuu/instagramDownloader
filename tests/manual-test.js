@@ -1,16 +1,14 @@
-const Downloader = require("../src/index").default;
+const { default : Downloader } = require("../src/index");
 
 var links = [
-    "https://www.instagram.com/p/CZo8E9ZIGmq/",// ikisi karışık
-    "https://www.instagram.com/p/CXGhz24j-jy/", // video 
-    "https://www.instagram.com/p/CZklZk7N0yD/" // resim
+    "https://www.instagram.com/p/CZo8E9ZIGmq/",
+    "https://www.instagram.com/p/CXGhz24j-jy/", 
+    "https://www.instagram.com/p/CZklZk7N0yD/"
 ];
 
-for(var link of links) { // yukarıdaki dizimizi döndü içine sokarak her bir elementi teker teker çekiyoruz
-    let İnstagram = new Downloader(link); // url mizi girerek yeni bir downloader oluşturuyoruz
-    let media = İnstagram.Media; // url mizin medya verisini çekioruz
+for(var link of links) {
+    let İnstagram = new Downloader(link);
+    let media = İnstagram.Media;
     
-    console.log(media.download()) // ve bu Medyayı indiriyoruz
-
-    // bu işlem tüm linkler için tekrar edicektir.
+    console.log(media.download())
 }

@@ -1,7 +1,7 @@
 "use strict";
-const Util = require("../Utils/Util").default;
-
+const { default: Util } = require("../Utils/Util");
 const { default: axios } = require("axios");
+
 const fs = require("fs")
 
 Util.prototyper(exports, "__esModule", { val: true });
@@ -144,7 +144,6 @@ class Video {
          * @name Image#synchronizer - Senkronizer
          * @type {Function}
          */
-        this.synchronizer = new (Util.synchronizer());
 
         /**
          * fonksiyonumuzu çağırıyoruz ki datayı kolaylıkla ayrıştıralım ve property leri tanımlayalım 
@@ -185,6 +184,10 @@ class Video {
         }
     }
 
+    get synchronizer() {
+        return new (Util.synchronizer());
+    }
+    
     /**
      * @name Video#createPath
      * Projeminizin dosyalarını tarar gerekli klasörler mevcut değilse açar mevcutsa ellemez
@@ -194,7 +197,7 @@ class Video {
      * 
      * @returns {Promise<void>}
      */
-    createPath(mediaID , path = "Medias") {
+    createPath(mediaID , path = "Medias" , name) {
         return new Promise((resolve , reject) => Util.awaiter(this , function* () {
             yield fs.access(path , (check) => { 
                 if(check) fs.mkdir(path , (error) => {
@@ -204,10 +207,10 @@ class Video {
             yield fs.access(path+"\\"+mediaID , (check) => {
                 if(check) fs.mkdir(path+"\\"+mediaID , (error) => {
                     if(error) reject.call(void 0 , error)
-                    else resolve.call(void 0 , [process.cwd() , path ,mediaID, "Video.mp4"].join("\\"))
+                    else resolve.call(void 0 , [process.cwd() , path ,mediaID, name].join("\\"))
                 }) 
 
-                else resolve.call(void 0 , [process.cwd() , path ,mediaID, "Video.mp4"].join("\\"))
+                else resolve.call(void 0 , [process.cwd() , path ,mediaID, name].join("\\"))
             })
         }))
     }
@@ -221,12 +224,35 @@ class Video {
     download($path = "Medias") {
         let { Video , shortCode , synchronizer , createPath } = this 
         return synchronizer.async(callback => Util.awaiter(this , function*() {
-            createPath(shortCode , $path).then((path) => Util.awaiter(this , function*() {
+            createPath(shortCode , $path , "Video.mp4").then((path) => Util.awaiter(this , function*() {
                 
                 const writer = fs.createWriteStream(path)
 
-                let executer = yield axios({url : Video.url , method : 'get' , responseType: 'stream'})
+                let executer = yield axios({url : Video.url , method : 'get' , responseType: 'stream'}).catch(err => { Util.error(err) });
     
+                executer.data.pipe(writer)
+        
+                writer.on('finish', () => callback.call(void 0 , { statusMessage : `Download is sucsess!` , File : path}));
+                writer.on('error', () => callback.call(void 0 , { statusMessage : `Download is unsucsess!` , File : void 0}));    
+            }))
+        }))()
+    }
+
+    /**
+     * 0. argümana belirttiğiniz dosyaya ya da default dosyasına (Medias) medyanın sesini indirir
+     * 
+     * @param {String} $path - indireceğiniz klasör
+     * @returns {Object} 
+     */
+    audioDownload($path = "Medias") {
+        let { Video , shortCode , synchronizer , createPath } = this 
+        return synchronizer.async(callback => Util.awaiter(this , function*() {
+            createPath(shortCode , $path, "Audio.mp3").then((path) => Util.awaiter(this , function*() {
+                
+                const writer = fs.createWriteStream(path)
+
+                let executer = yield axios({url : Video.url , method : 'get' , responseType: 'stream'}).catch(err => { Util.error(err) });
+
                 executer.data.pipe(writer)
         
                 writer.on('finish', () => callback.call(void 0 , { statusMessage : `Download is sucsess!` , File : path}));

@@ -1,8 +1,8 @@
 "use strict";
 
 const { default: axios } = require("axios");
+const { default: Util } = require("../Utils/Util");
 
-const Util = require("../Utils/Util").default;
 const fs = require("fs")
 
 Util.prototyper(exports, "__esModule", { val: true });
@@ -133,7 +133,6 @@ class Image {
          * @name Image#synchronizer - Senkronizer
          * @type {Function}
          */
-        this.synchronizer = new (Util.synchronizer());
 
 
         /**
@@ -175,6 +174,11 @@ class Image {
         this.Image = data.Image
     }
 
+
+    get synchronizer() {
+        return new (Util.synchronizer());
+    }
+    
     /**
      * @name Image#createPath
      * Projeminizin dosyalarını tarar gerekli klasörler mevcut değilse açar mevcutsa ellemez
@@ -216,7 +220,7 @@ class Image {
                 
                 const writer = fs.createWriteStream(path)
 
-                let executer = yield axios({url : Image , method : 'get' , responseType: 'stream'})
+                let executer = yield axios({url : Image , method : 'get' , responseType: 'stream'}).catch(err => { Util.error(err) });
     
                 executer.data.pipe(writer)
         
@@ -224,6 +228,12 @@ class Image {
                 writer.on('error', () => callback.call(void 0 , { statusMessage : `Download is unsucsess!` , File : void 0}));    
             }))
         }))()
+    }
+
+    audioDownload() {
+        return function (callback) {
+            return callback    
+        }.call(void 0 , { statusMessage : `Image media can't have sound!` , File : void 0});
     }
 }
 
