@@ -116,6 +116,7 @@ let instagramData = synchronizer.async(callback => Util.awaiter(this , function*
     let Data = yield İnstagram.asyncData;
     callback.call(void 0 , Data);
 })).call(void 0)
+
 console.log(instagramData) // output : Object { ... } - İnstagramData
 ```
 
@@ -127,10 +128,30 @@ console.log(instagramData) // output : Object { ... } - İnstagramData
 ```js
 const Logger = Util.logger()
 let logger = new Logger(process);
-    logger.oluştur({yazı : "Bilgilerine bakmak istediğiniz medyanın linkini giriniz...\r\n", ilkMesaj : true} , cevap_1=> {
-    logger.oluştur({yazı : "Url nin verisini mi göndermemi istersin medyasını mı? lütfen sadece `veri` ya da `medya` olarak cevap verin!!!\r\n" , ilkMesaj : false}, cevap_2 => {
+logger.oluştur({yazı : "Bilgilerine bakmak istediğiniz medyanın linkini giriniz...\r\n", ilkMesaj : true} , cevap_1=> {
+    logger.oluştur({yazı : "Url nin verisini mi göndermemi istersin medyasını mı? lütfen sadece `veri` ya da`medya`olarakverin!!!\r\n",ilkMesaj : false}, cevap_2 => {
         if(!["veri" , "medya"].some(x => cevap_2 === x)) return console.log("lütfen sadece `medya` ya da `veri` yazınız!!!")
-	@@ -173,132 +152,6 @@ for(var link of links) { // yukarıdaki dizimizi döndü içine sokarak her bir
+        let instagram = new Downloader(cevap_1.trim())
+        if(cevap_2.toLowerCase() === "veri") console.log("Belirttiğiniz Urlnin bilgileri gönderiliyor...\n") , console.log(instagram.getData)
+        if(cevap_2.toLowerCase() === "medya") console.log("Belirttiğiniz Urlnin Mediya bilgileri gönderiliyor...\n") , console.log(instagram.Media);
+        
+        console.log("Logger'ı kapatarak konsola serbest mesaj iznini açtım")
+        logger.kapat()
+    });
+})
+```
+## Medya indirme örnek kodu
+```js
+var links = [
+    "https://www.instagram.com/p/CZo8E9ZIGmq/",// ikisi karışık
+    "https://www.instagram.com/p/CXGhz24j-jy/", // video 
+    "https://www.instagram.com/p/CZklZk7N0yD/" // resim
+];
+for(var link of links) { // yukarıdaki dizimizi döndü içine sokarak her bir elementi teker teker çekiyoruz
+    let İnstagram = new Downloader(link); // url mizi girerek yeni bir downloader oluşturuyoruz
+    let media = İnstagram.Media; // url mizin medya verisini çekioruz
+    
+    console.log(media.download()) // ve bu Medyayı indiriyoruz
     // bu işlem tüm linkler için tekrar edicektir.
 }
 ```
@@ -245,7 +266,6 @@ https://user-images.githubusercontent.com/67225902/153280783-bda064ec-a287-4b4b-
 <h3>🌟 Bağlantılar!</h3>
 <p align="center">
 <a href="https://www.instagram.com/alp.kahyaa/" target"blank_"><img src="https://img.shields.io/badge/INSTAGRAM%20-DC3175.svg?&style=for-the-badge&logo=instagram&logoColor=white"></a>
-	@@ -308,3 +161,4 @@ https://user-images.githubusercontent.com/67225902/153280783-bda064ec-a287-4b4b-
 <a href="https://discord.com/users/721391768255594577" target"blank_"><img src="https://img.shields.io/badge/Discord-ffbb00?style=for-the-badge&logo=discord&logoColor=white"></a>
 <a href="https://alpsu-u-teala.glitch.me" target"blank_"><img src="https://img.shields.io/badge/Website-ff0004?style=for-the-badge&logo=google&logoColor=white"></a>
 </p>
