@@ -233,8 +233,7 @@ class User {
             let { data } = yield Util.fetcher.get(`https://i.instagram.com/api/v1/feed/user/${ID}/reel_media/`).catch(err => { Util.error(err) });
 
             let check = data.user.is_private;
-
-            if(check) return callback.call(void 0 , { statusMessage : `Private account!` , File : void 0})
+            if(check) return callback.call(void 0 , [{ statusMessage : `Private account!`  , download : function() { return "Private account!" }}])
             
             let arr = data.items.map(story => {
                 return {
@@ -282,18 +281,25 @@ class User {
                 veriables : function veriables(highlightID) {
                     return `{ "highlight_reel_ids":[${highlightID}],"precomposed_overlay":false}`
                 }
+            },
+
+            posts : {
+                token : "e769aa130647d2354c40ea6a439bfc08",
+                veriables : function(userID , limit) {
+                    return `{"id": ${userID} , "first" : ${limit}}`
+                }
             }
         }
     }
 
    /**
-    * @name User#getStories
+    * @name User#getHighlights
     * kullanıcımızın highlight bilgilerini çeker
     * 
     * @returns {Object} 
     */
     get getHighlights() {
-        if(this.privateAcc) return { statusMessage : `Private account!` }
+        if(this.privateAcc) return [{ statusMessage : `Private account!`  , download : function() { return "Private account!" }}]
         
         let synchronizer = new (Util.synchronizer())
         let config = this.#config
@@ -340,6 +346,134 @@ class User {
            }
 
            callback.call(void 0 , obj.map(object => { return new Highlight(object) } ))
+        }))()
+    }
+
+    getPosts(limit = Number = 10) {
+        if(this.privateAcc) return { statusMessage : `Private account!` }
+        
+        let synchronizer = new (Util.synchronizer())
+        let config = this.#config
+        let { ID : id , username , fullname , privateAcc , profilePicture , verifiedAcc } = this 
+        let { default: Image } = require("../Structures/Image")
+        let { default: Video } = require("../Structures/Video")
+        let { default: Sidecar} = require("../Structures/Sidecar")
+        return synchronizer.async(callback => Util.awaiter(this , function*() {
+           let { data : { data : { user : { edge_owner_to_timeline_media: { edges : medias }}} } }= yield Util.fetcher.get(`https://www.instagram.com/graphql/query/?query_hash=${config.posts.token}&variables=${config.posts.veriables(id , limit)}`);
+
+            let constructorArray = medias.map(({node : data}) => {
+                let type = {GraphVideo : "video" , GraphImage : "image" , GraphSidecar : "sidecar"}[data.__typename]
+
+                switch(type) {
+                    case "image": {
+                        return new Image({
+                            takenDate : (new Date(Date(data.taken_at))).toLocaleString(),
+                            ID : data.id,
+                            MediaType : type,
+                            shortCode : data.shortcode,
+                            commentCount : data.edge_media_to_comment.count,
+                            likeCount : data.edge_media_preview_like.count,
+                            sizes : {
+                                width : data.dimensions.width,
+                                height : data.dimensions.height
+                            },
+        
+                            user : {
+                                ID : id,
+                                username : username,
+                                fullname : fullname,
+                                privateAcc : Boolean(privateAcc),
+                                profilePicture : profilePicture,
+                                verified : verifiedAcc,
+                            },
+        
+                            caption : data?.edge_media_to_caption ? {
+                                ID : id || null,
+                                UserID : id || null,
+                                text : String(data?.edge_media_to_caption?.edges[0]?.node.text || null)
+                            } : null,
+        
+                            Image : data.display_resources.pop().src
+                        })
+                    };
+                    case "sidecar": {
+                        return new Sidecar({
+                            takenDate : (new Date(Date(data.taken_at))).toLocaleString(),
+                            ID : data.id,
+                            MediaType : type,
+                            shortCode : data.shortcode,
+                            commentCount : data.edge_media_to_comment.count,
+                            likeCount : data.edge_media_preview_like.count,
+                            sizes : {
+                                width : data.dimensions.width,
+                                height : data.dimensions.height
+                            },
+        
+                            user : {
+                                ID : id,
+                                username : username,
+                                fullname : fullname,
+                                privateAcc : Boolean(privateAcc),
+                                profilePicture : profilePicture,
+                                verified : verifiedAcc,
+                            },
+        
+                            caption : data?.edge_media_to_caption ? {
+                                ID : id || null,
+                                UserID : id || null,
+                                text : String(data?.edge_media_to_caption?.edges[0]?.node.text || null)
+                            } : null,
+        
+                            medias : data.edge_sidecar_to_children?.edges?.map(({node : data}) => {
+                                return {
+                                    ID : data.id,
+                                    type : {GraphImage : "Image" , GraphVideo : "Video"}[data.__typename],
+                                    media : data.__typename === "GraphImage" ? data. display_resources.pop().src : data. video_url,
+                                    width: data.dimensions.width,
+                                    height: data.dimensions.height
+                                }
+                            }),
+                            mediaSize : data.edge_sidecar_to_children?.edges?.length
+                        })
+                    };
+                    case "video": {
+                        return new Video({
+                            takenDate : (new Date(Date(data.taken_at))).toLocaleString(),
+                            ID : data.id,
+                            MediaType : type,
+                            shortCode : data.shortcode,
+                            commentCount : data.edge_media_to_comment.count,
+                            likeCount : data.edge_media_preview_like.count,
+                            sizes : {
+                                width : data.dimensions.width,
+                                height : data.dimensions.height
+                            },
+        
+                            user : {
+                                ID : id,
+                                username : username,
+                                fullname : fullname,
+                                privateAcc : Boolean(privateAcc),
+                                profilePicture : profilePicture,
+                                verified : verifiedAcc,
+                            },
+        
+                            caption : data?.edge_media_to_caption ? {
+                                ID : id || null,
+                                UserID : id || null,
+                                text : String(data?.edge_media_to_caption?.edges[0]?.node.text || null)
+                            } : null,
+        
+                            Video : {
+                                width : data.dimensions.width,
+                                height : data.dimensions.height,
+                                url : data.video_url,
+                            }
+                        })
+                    }
+                }
+            });
+           return callback.call(void 0 , constructorArray);
         }))()
     }
 }

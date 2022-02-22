@@ -482,7 +482,9 @@ let map = new Map([
     ['fetchUser' , Util.getUser],
     ['fetchStories' , Util.Stories],
     ['fetchHighlights' , Util.getHighlights],
+    ['fetchPosts', Util.getPosts],
     ['Util' , Util],
+    ['default' , İnstagramDownloader]
 ])
 
 let obj = {};

@@ -1,5 +1,5 @@
 const Downloader = require("../src/index").default;
-const Util = new require("../src/index").Util;
+const Util = require("../src/index").Util;
 const Logger = Util.logger()
 
 

@@ -152,11 +152,7 @@ class Sidecar {
             profilePicture : data.user.profilePicture,
             verified : data.user.verified,
         };
-        this.caption = {
-            ID : data.caption.ID,
-            UserID : data.caption.UserID,
-            text : data.caption.text
-        };
+        this.caption = data.caption
         this.mediaSize = data.mediaSize
         this.medias = data.medias
     }
