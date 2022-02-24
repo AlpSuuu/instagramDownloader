@@ -5,6 +5,7 @@ basit bir instagram media indirme projesi.
 [MIT License](https://github.com/AlpSuuu/instagramDownloader/blob/main/LICENSE)
 
 ## İndirme
+![](https://komarev.com/ghpvc/?username=Alpsuuu)![](https://img.shields.io/npm/dt/instagram-url-downloader.svg?maxAge=3600)![](https://img.shields.io/badge/Unpacked%20Size-2.21%20MB-brightgreen)![](https://img.shields.io/npm/v/instagram-url-downloader?label=lasted%20version)![](https://img.shields.io/npm/l/instagram-url-downloader)
 ```
 npm install instagram-url-downloader
 git clone https://github.com/AlpSuuu/instagramDownloader.git
