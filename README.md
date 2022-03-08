@@ -1,4 +1,4 @@
-## [instagramDownloader 😋](https://github.com/AlpSuuu/instagramDownloader/)
+## [instagramDownloader 😋](https://www.npmjs.com/package/instagram-url-downloader)
 basit bir instagram media indirme projesi.
 
 ## Lisans
